@@ -1,14 +1,12 @@
 Гофермарт
 ===
 
-## Table of Contents
-
 [TOC]
 
 ## ER-диаграмма
 ```mermaid
 erDiagram
-    USER ||--o{ ORDER : is
+    USER ||--o{ ORDER : has
     USER {
         string userId PK
         string firstName
@@ -18,15 +16,39 @@ erDiagram
     }
     ORDER {
         string orderId PK
+        string userId FK
+        string status FK
         string name
-        string status
-        int accrual
         string uploaded_at
     }
-    LOGIN |o--|| USER : has
+    ORDER }o--|| STATUS : contains
+    STATUS{
+        string code PK
+        string text
+    }
+    USER ||--|| LOGIN : has
     LOGIN {
-        string Login PK
-        string Password
+        string login PK
+        string userId FK
+        string password
+    }
+    ACCRUAL }o--|| ORDER : contains
+    ACCRUAL }o--|| USER : contains
+    ACCRUAL{
+        string accrualId PK
+        string userId FK
+        string orderId FK
+        int accrual
+        string processed_at
+    }
+    WITHDRAWAL }o--|| ORDER : contains
+    WITHDRAWAL }o--|| USER : contains
+    WITHDRAWAL{
+        string withdrawalId PK
+        string userId FK
+        string orderId FK
+        int sum
+        string processed_at
     }
 ```
 
