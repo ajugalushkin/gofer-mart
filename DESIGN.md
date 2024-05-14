@@ -3,7 +3,7 @@
 
 [TOC]
 
-## ER-диаграмма
+## Описание основных сущностей и связей между ними ( ER-диаграмма)
 ```mermaid
 erDiagram
     USER ||--o{ ORDER : has
@@ -51,12 +51,7 @@ erDiagram
         string processed_at
     }
 ```
+## Список логических компонентов системы и схема из зависимостей друг от друга (общая архитектура решения)
+![image](https://hackmd.io/_uploads/rJJ-lcxX0.png)
 
-## Sequence-диаграмма
-```sequence
-Alice->Bob: Hello Bob, how are you?
-Note right of Bob: Bob thinks
-Bob-->Alice: I am good thanks!
-Note left of Alice: Alice responds
-Alice->Bob: Where have you been?
-```
+## Две диаграммы последовательностей (sequence-диаграммы): для операции начисления балов - отразить взаимодействие с внешней системой), для операции снятия с баланса
