@@ -1,22 +1,22 @@
-<mxfile host="app.diagrams.net" modified="2024-05-14T07:03:31.009Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36" etag="b4hFZJ5_Rqed4ZI9fb8U" version="24.4.0" type="github">
+<mxfile host="app.diagrams.net" modified="2024-05-14T07:15:43.941Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36" etag="IlqcOTayAKXiBriBLfSF" version="24.4.0" type="github">
   <diagram name="Страница — 1" id="xXiPJi63irHFBUgczHHm">
-    <mxGraphModel dx="2199" dy="786" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="2441" dy="2094" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="k6saxv5MuIaeYPeOtD6K-1" value="Сетевой слой" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;verticalAlign=top;" vertex="1" parent="1">
-          <mxGeometry x="50" y="117.5" width="120" height="270" as="geometry" />
+          <mxGeometry x="-20" y="97.5" width="120" height="270" as="geometry" />
         </mxCell>
         <mxCell id="k6saxv5MuIaeYPeOtD6K-5" value="HTTP Server" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="67.5" y="210" width="85" height="85" as="geometry" />
+          <mxGeometry x="-2.5" y="190" width="85" height="85" as="geometry" />
         </mxCell>
         <mxCell id="k6saxv5MuIaeYPeOtD6K-6" value="User" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;" vertex="1" parent="1">
-          <mxGeometry x="-80" y="222.5" width="30" height="60" as="geometry" />
+          <mxGeometry x="-150" y="202.5" width="30" height="60" as="geometry" />
         </mxCell>
         <mxCell id="k6saxv5MuIaeYPeOtD6K-9" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="k6saxv5MuIaeYPeOtD6K-6" target="k6saxv5MuIaeYPeOtD6K-5">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="390" y="330" as="sourcePoint" />
-            <mxPoint x="440" y="280" as="targetPoint" />
+            <mxPoint x="320" y="310" as="sourcePoint" />
+            <mxPoint x="370" y="260" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="k6saxv5MuIaeYPeOtD6K-10" value="HTTPS" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="k6saxv5MuIaeYPeOtD6K-9">
@@ -25,22 +25,22 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="k6saxv5MuIaeYPeOtD6K-11" value="Слой работы с БД" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;verticalAlign=top;" vertex="1" parent="1">
-          <mxGeometry x="680" y="10" width="120" height="460" as="geometry" />
+          <mxGeometry x="850" y="10" width="120" height="460" as="geometry" />
         </mxCell>
         <mxCell id="k6saxv5MuIaeYPeOtD6K-12" value="БД" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.database;whiteSpace=wrap;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;" vertex="1" parent="1">
-          <mxGeometry x="870" y="175" width="140" height="107.5" as="geometry" />
+          <mxGeometry x="1040" y="175" width="140" height="107.5" as="geometry" />
         </mxCell>
         <mxCell id="k6saxv5MuIaeYPeOtD6K-13" value="Слой валидации" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;verticalAlign=top;" vertex="1" parent="1">
-          <mxGeometry x="310" y="10" width="110" height="450" as="geometry" />
+          <mxGeometry x="200" y="3.75" width="110" height="450" as="geometry" />
         </mxCell>
         <mxCell id="k6saxv5MuIaeYPeOtD6K-17" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="k6saxv5MuIaeYPeOtD6K-14" target="k6saxv5MuIaeYPeOtD6K-15">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="k6saxv5MuIaeYPeOtD6K-14" value="Valid Request" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="322.5" y="90" width="85" height="85" as="geometry" />
+          <mxGeometry x="212.5" y="83.75" width="85" height="85" as="geometry" />
         </mxCell>
         <mxCell id="k6saxv5MuIaeYPeOtD6K-15" value="Auth" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="322.5" y="245" width="85" height="85" as="geometry" />
+          <mxGeometry x="212.5" y="238.75" width="85" height="85" as="geometry" />
         </mxCell>
         <mxCell id="k6saxv5MuIaeYPeOtD6K-16" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.006;entryY=0.588;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="k6saxv5MuIaeYPeOtD6K-5" target="k6saxv5MuIaeYPeOtD6K-14">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
@@ -61,7 +61,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="k6saxv5MuIaeYPeOtD6K-22" value="Repository" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
-          <mxGeometry x="697.5" y="175" width="85" height="85" as="geometry" />
+          <mxGeometry x="867.5" y="175" width="85" height="85" as="geometry" />
         </mxCell>
         <mxCell id="k6saxv5MuIaeYPeOtD6K-24" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="k6saxv5MuIaeYPeOtD6K-19" target="k6saxv5MuIaeYPeOtD6K-22">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
@@ -71,9 +71,18 @@
         </mxCell>
         <mxCell id="k6saxv5MuIaeYPeOtD6K-25" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="k6saxv5MuIaeYPeOtD6K-22" target="k6saxv5MuIaeYPeOtD6K-12">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="470" y="330" as="sourcePoint" />
-            <mxPoint x="520" y="280" as="targetPoint" />
+            <mxPoint x="640" y="330" as="sourcePoint" />
+            <mxPoint x="690" y="280" as="targetPoint" />
           </mxGeometry>
+        </mxCell>
+        <mxCell id="k6saxv5MuIaeYPeOtD6K-29" value="Слой Валидации&lt;div&gt;1. Проверка корректности запроса&lt;/div&gt;&lt;div style=&quot;&quot;&gt;2. Регистрация/Аутентификация пользователя&lt;/div&gt;" style="whiteSpace=wrap;html=1;shape=mxgraph.basic.rectCallout;dx=30;dy=15;boundedLbl=1;direction=east;align=left;" vertex="1" parent="1">
+          <mxGeometry x="290" y="-120" width="112.5" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="k6saxv5MuIaeYPeOtD6K-30" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;Слой приложения&lt;/font&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;1.&lt;span style=&quot;background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.85); font-family: &amp;quot;YS Text&amp;quot;, Arial, Helvetica, sans-serif; white-space-collapse: preserve-breaks;&quot;&gt;загрузка пользователем номера заказа для расчёта&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;&lt;span style=&quot;background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.85); font-family: &amp;quot;YS Text&amp;quot;, Arial, Helvetica, sans-serif; white-space-collapse: preserve-breaks;&quot;&gt;2.&lt;/span&gt;&lt;/font&gt;&lt;span style=&quot;background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.85); font-family: &amp;quot;YS Text&amp;quot;, Arial, Helvetica, sans-serif; white-space-collapse: preserve-breaks;&quot;&gt;получение списка загруженных пользователем номеров заказов, статусов их&amp;nbsp;обработки и&amp;nbsp;информации о&amp;nbsp;начислениях&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;3.&lt;span style=&quot;background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.85); font-family: &amp;quot;YS Text&amp;quot;, Arial, Helvetica, sans-serif; white-space-collapse: preserve-breaks;&quot;&gt;получение текущего баланса счёта баллов лояльности пользователя&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;&lt;span style=&quot;background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.85); font-family: &amp;quot;YS Text&amp;quot;, Arial, Helvetica, sans-serif; white-space-collapse: preserve-breaks;&quot;&gt;4.&lt;/span&gt;&lt;/font&gt;&lt;span style=&quot;background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.85); font-family: &amp;quot;YS Text&amp;quot;, Arial, Helvetica, sans-serif; white-space-collapse: preserve-breaks;&quot;&gt;запрос на&amp;nbsp;списание баллов с&amp;nbsp;накопительного счёта в&amp;nbsp;счёт оплаты нового заказа&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;&lt;span style=&quot;background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.85); font-family: &amp;quot;YS Text&amp;quot;, Arial, Helvetica, sans-serif; white-space-collapse: preserve-breaks;&quot;&gt;5.&lt;/span&gt;&lt;/font&gt;&lt;span style=&quot;background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.85); font-family: &amp;quot;YS Text&amp;quot;, Arial, Helvetica, sans-serif; white-space-collapse: preserve-breaks;&quot;&gt;получение информации о&amp;nbsp;выводе средств с&amp;nbsp;накопительного счёта пользователем&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;shape=mxgraph.basic.rectCallout;dx=30;dy=15;boundedLbl=1;align=left;direction=east;" vertex="1" parent="1">
+          <mxGeometry x="520" y="-205" width="283" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="k6saxv5MuIaeYPeOtD6K-31" value="Слой работы с БД&lt;div&gt;1. Создание&lt;/div&gt;&lt;div&gt;2.&amp;nbsp; Обновленин&lt;/div&gt;" style="whiteSpace=wrap;html=1;shape=mxgraph.basic.rectCallout;dx=30;dy=15;boundedLbl=1;" vertex="1" parent="1">
+          <mxGeometry x="910" y="-86.25" width="123" height="90" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
