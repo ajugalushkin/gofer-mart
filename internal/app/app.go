@@ -48,17 +48,17 @@ import (
 //
 //		return nil
 //	}
-type app struct {
+type App struct {
 	ctx context.Context
 	//repo  *repository.Repository
 	//cache map[string]repository.User
 }
 
-func NewApp(ctx context.Context) *app {
-	return &app{ctx}
+func NewApp(ctx context.Context) *App {
+	return &App{ctx}
 }
 
-func (a app) Routes(r *echo.Echo) {
+func (a App) Routes(r *echo.Echo) {
 	r.POST("/api/user/register", a.register)
 	r.POST("/api/user/login", a.login)
 	r.POST("/api/user/orders", a.postOrders)
@@ -69,7 +69,7 @@ func (a app) Routes(r *echo.Echo) {
 	r.GET("/api/user/withdrawals", a.getWithdrawals)
 }
 
-func (a app) register(echoCtx echo.Context) error {
+func (a App) register(echoCtx echo.Context) error {
 	body, err := io.ReadAll(echoCtx.Request().Body)
 	if err != nil {
 		return echoCtx.JSON(http.StatusBadRequest, err.Error())
@@ -97,7 +97,7 @@ func (a app) register(echoCtx echo.Context) error {
 	return echoCtx.JSON(http.StatusOK, "")
 }
 
-func (a app) login(echoCtx echo.Context) error {
+func (a App) login(echoCtx echo.Context) error {
 	body, err := io.ReadAll(echoCtx.Request().Body)
 	if err != nil {
 		return echoCtx.JSON(http.StatusBadRequest, err.Error())
@@ -125,22 +125,22 @@ func (a app) login(echoCtx echo.Context) error {
 	return echoCtx.JSON(http.StatusOK, "")
 }
 
-func (a app) getOrders(echoCtx echo.Context) error {
+func (a App) getOrders(echoCtx echo.Context) error {
 	return nil
 }
 
-func (a app) postOrders(echoCtx echo.Context) error {
+func (a App) postOrders(echoCtx echo.Context) error {
 	return nil
 }
 
-func (a app) getBalance(echoCtx echo.Context) error {
+func (a App) getBalance(echoCtx echo.Context) error {
 	return nil
 }
 
-func (a app) postBalanceWithdraw(echoCtx echo.Context) error {
+func (a App) postBalanceWithdraw(echoCtx echo.Context) error {
 	return nil
 }
 
-func (a app) getWithdrawals(echoCtx echo.Context) error {
+func (a App) getWithdrawals(echoCtx echo.Context) error {
 	return nil
 }

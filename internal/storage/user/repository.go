@@ -60,8 +60,9 @@ func (r *repo) AddNewUser(ctx context.Context, user dto.User) error {
 
 func (r *repo) GetUser(ctx context.Context, user dto.User) (*dto.User, error) {
 	var (
-		err         error
-		storageUser *dto.User
+		err             error
+		storageUserList []dto.User
+		storageUser     dto.User
 	)
 
 	err = database.WithTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
@@ -77,11 +78,12 @@ func (r *repo) GetUser(ctx context.Context, user dto.User) (*dto.User, error) {
 			return err
 		}
 
-		return r.db.SelectContext(ctx, &storageUser, query, args...)
+		return r.db.SelectContext(ctx, &storageUserList, query, args...)
 	})
 
 	if err != nil {
-		return &user, errors.Wrap(err, "repository.GetUser")
+		return &storageUser, errors.Wrap(err, "repository.GetUser")
 	}
-	return &user, nil
+	storageUser = storageUserList[0]
+	return &storageUser, nil
 }

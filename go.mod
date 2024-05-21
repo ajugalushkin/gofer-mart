@@ -1,6 +1,6 @@
 module github.com/ajugalushkin/gofer-mart
 
-go 1.22.2
+go 1.21.10
 
 require (
 	github.com/Masterminds/squirrel v1.5.4

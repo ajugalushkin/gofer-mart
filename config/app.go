@@ -17,16 +17,15 @@ type AppConfig struct {
 
 func init() {
 	viper.SetDefault("RunAddr", ":8080")
-	viper.SetDefault("DataBaseURI",
-		"postgres://postgres:postgres@localhost/postgres?sslmode=disable")
+	viper.SetDefault("DataBase_URI", "")
 	viper.SetDefault("AccrualSystemAddress", "")
 	viper.SetDefault("TokenKey", "")
 }
 
 func bindToEnv() {
-	viper.SetEnvPrefix("test")
+	//viper.SetEnvPrefix("test")
 	_ = viper.BindEnv("RunAddr")
-	_ = viper.BindEnv("DataBaseURI")
+	_ = viper.BindEnv("DataBase_URI")
 	_ = viper.BindEnv("AccrualSystemAddress")
 	_ = viper.BindEnv("TokenKey")
 }
@@ -49,7 +48,7 @@ func ReadConfig() *AppConfig {
 	result := &AppConfig{
 		RunAddr: viper.GetString("RunAddr"),
 		//FlagLogLevel: viper.GetString("FlagLogLevel"),
-		DataBaseURI:          viper.GetString("DataBaseURI"),
+		DataBaseURI:          viper.GetString("DataBase_URI"),
 		AccrualSystemAddress: viper.GetString("AccrualSystemAddress"),
 	}
 	return result

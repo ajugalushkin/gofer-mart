@@ -10,7 +10,7 @@ type Login struct {
 
 //easyjson:json
 type User struct {
-	Id       string `db:"id"`
-	Login    string `db:"user_id" `
+	Id       string `db:"user_id"`
+	Login    string `db:"login" `
 	Password string `db:"password_hash" `
 }
