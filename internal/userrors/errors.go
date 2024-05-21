@@ -1,4 +1,4 @@
-package user_errors
+package userrors
 
 import "github.com/pkg/errors"
 

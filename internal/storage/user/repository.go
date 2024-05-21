@@ -13,7 +13,7 @@ import (
 
 	"github.com/ajugalushkin/gofer-mart/internal/database"
 	"github.com/ajugalushkin/gofer-mart/internal/dto"
-	"github.com/ajugalushkin/gofer-mart/internal/user_errors"
+	"github.com/ajugalushkin/gofer-mart/internal/userrors"
 )
 
 type Repository interface {
@@ -51,7 +51,7 @@ func (r *repo) AddNewUser(ctx context.Context, user dto.User) error {
 
 	if err != nil {
 		if pgErr, ok := errors.Unwrap(errors.Unwrap(err)).(*pgconn.PgError); ok && pgErr.Code == pgerrcode.UniqueViolation {
-			return errors.Wrapf(user_errors.ErrorDuplicateLogin, "%s %s", user_errors.ErrorDuplicateLogin, user.Login)
+			return errors.Wrapf(userrors.ErrorDuplicateLogin, "%s %s", userrors.ErrorDuplicateLogin, user.Login)
 		}
 		return errors.Wrap(err, "repository.AddNewUser")
 	}

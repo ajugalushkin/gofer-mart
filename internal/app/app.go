@@ -11,7 +11,7 @@ import (
 	"github.com/ajugalushkin/gofer-mart/internal/cookies"
 	"github.com/ajugalushkin/gofer-mart/internal/dto"
 	"github.com/ajugalushkin/gofer-mart/internal/storage"
-	"github.com/ajugalushkin/gofer-mart/internal/user_errors"
+	"github.com/ajugalushkin/gofer-mart/internal/userrors"
 )
 
 //	func Run(ctx context.Context) error {
@@ -86,7 +86,7 @@ func (a App) register(echoCtx echo.Context) error {
 		Password: loginData.Password,
 	})
 	if err != nil {
-		if errors.Is(err, user_errors.ErrorDuplicateLogin) {
+		if errors.Is(err, userrors.ErrorDuplicateLogin) {
 			return echoCtx.JSON(http.StatusConflict, err.Error())
 		}
 		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
@@ -114,7 +114,7 @@ func (a App) login(echoCtx echo.Context) error {
 		Password: loginData.Password,
 	})
 	if err != nil {
-		if errors.Is(err, user_errors.ErrorLoginAlreadyTaken) {
+		if errors.Is(err, userrors.ErrorLoginAlreadyTaken) {
 			return echoCtx.JSON(http.StatusUnauthorized, err.Error())
 		}
 		return echoCtx.JSON(http.StatusUnauthorized, err.Error())

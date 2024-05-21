@@ -36,8 +36,8 @@ func easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto(in *jlexer.
 			continue
 		}
 		switch key {
-		case "Id":
-			out.Id = string(in.String())
+		case "ID":
+			out.ID = string(in.String())
 		case "Login":
 			out.Login = string(in.String())
 		case "Password":
@@ -57,9 +57,9 @@ func easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto(out *jwrite
 	first := true
 	_ = first
 	{
-		const prefix string = ",\"Id\":"
+		const prefix string = ",\"ID\":"
 		out.RawString(prefix[1:])
-		out.String(string(in.Id))
+		out.String(string(in.ID))
 	}
 	{
 		const prefix string = ",\"Login\":"
