@@ -1,0 +1,5 @@
+name: gofermart-api
+
+networks:
+  gofermart-network:
+    driver: bridge

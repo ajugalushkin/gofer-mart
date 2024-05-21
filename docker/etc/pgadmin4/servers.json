@@ -1,0 +1,13 @@
+{
+    "Servers": {
+        "1": {
+            "Name": "Gofermart Database",
+            "Group": "Servers",
+            "Host": "postgres",
+            "Port": 5432,
+            "MaintenanceDB": "gofermart",
+            "Username": "praktikum",
+            "SSLMode": "prefer"
+        }
+    }
+}
