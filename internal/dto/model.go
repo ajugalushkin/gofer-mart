@@ -14,3 +14,10 @@ type User struct {
 	Login    string `db:"login" `
 	Password string `db:"password_hash" `
 }
+
+//easyjson:json
+type Order struct {
+	ID          string `db:"order_id"`
+	OrderNumber string `db:"order_number" `
+	UserID      string `db:"user_id" `
+}

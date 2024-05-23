@@ -8,23 +8,31 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 
 	"github.com/ajugalushkin/gofer-mart/config"
+	"github.com/ajugalushkin/gofer-mart/internal/auth"
+	"github.com/ajugalushkin/gofer-mart/internal/dto"
 )
 
 type Claims struct {
 	jwt.RegisteredClaims
-	UserData string
+	Login dto.Login
 }
 
 const TokenExp = time.Hour * 3
 
-func buildJWTString(ctx context.Context, data string) (string, error) {
+func buildJWTString(ctx context.Context, login dto.Login) (string, error) {
 	cfg := config.FlagsFromContext(ctx)
+
+	var err error
+	login.Password, err = auth.HashPassword(login.Password)
+	if err != nil {
+		return "", err
+	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(TokenExp)),
 		},
-		UserData: data,
+		Login: login,
 	})
 
 	tokenString, err := token.SignedString([]byte(cfg.TokenKey))
@@ -35,31 +43,31 @@ func buildJWTString(ctx context.Context, data string) (string, error) {
 	return tokenString, nil
 }
 
-//func GetUserID(ctx context.Context, tokenString string) int {
-//	flags := config.FlagsFromContext(ctx)
-//	claims := &Claims{}
-//	_, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
-//		return []byte(flags.SecretKey), nil
-//	})
-//	if err != nil {
-//		return 0
-//	}
-//
-//	return claims.UserID
-//}
+func GetLogin(ctx context.Context, tokenString string) *dto.Login {
+	cfg := config.FlagsFromContext(ctx)
+	claims := &Claims{}
+	_, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
+		return []byte(cfg.TokenKey), nil
+	})
+	if err != nil {
+		return &dto.Login{}
+	}
 
-func Create(ctx context.Context, nameCookie string, data string) *http.Cookie {
+	return &claims.Login
+}
+
+func Create(ctx context.Context, nameCookie string, login dto.Login) *http.Cookie {
 	cookie := new(http.Cookie)
 	cookie.Name = nameCookie
-	cookie.Value, _ = buildJWTString(ctx, data)
+	cookie.Value, _ = buildJWTString(ctx, login)
 	cookie.Expires = time.Now().Add(TokenExp)
 	return cookie
 }
 
-/*func Read(echoCtx echo.Context, name string) (string, error) {
-	cookie, err := echoCtx.Cookie(name)
-	if err != nil {
-		return "", err
-	}
-	return cookie.Value, nil
-}*/
+//func ReadCookieData(ctx context.Context, echoCtx echo.Context, name string) (*dto.Login, error) {
+//	cookie, err := echoCtx.Cookie(name)
+//	if err != nil {
+//		return &dto.Login{}, err
+//	}
+//	return getLogin(ctx, cookie.Value), nil
+//}

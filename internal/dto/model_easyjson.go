@@ -97,7 +97,87 @@ func (v *User) UnmarshalJSON(data []byte) error {
 func (v *User) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto(l, v)
 }
-func easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto1(in *jlexer.Lexer, out *Login) {
+func easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto1(in *jlexer.Lexer, out *Order) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		if isTopLevel {
+			in.Consumed()
+		}
+		in.Skip()
+		return
+	}
+	in.Delim('{')
+	for !in.IsDelim('}') {
+		key := in.UnsafeFieldName(false)
+		in.WantColon()
+		if in.IsNull() {
+			in.Skip()
+			in.WantComma()
+			continue
+		}
+		switch key {
+		case "ID":
+			out.ID = string(in.String())
+		case "OrderNumber":
+			out.OrderNumber = string(in.String())
+		case "UserID":
+			out.UserID = string(in.String())
+		default:
+			in.SkipRecursive()
+		}
+		in.WantComma()
+	}
+	in.Delim('}')
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto1(out *jwriter.Writer, in Order) {
+	out.RawByte('{')
+	first := true
+	_ = first
+	{
+		const prefix string = ",\"ID\":"
+		out.RawString(prefix[1:])
+		out.String(string(in.ID))
+	}
+	{
+		const prefix string = ",\"OrderNumber\":"
+		out.RawString(prefix)
+		out.String(string(in.OrderNumber))
+	}
+	{
+		const prefix string = ",\"UserID\":"
+		out.RawString(prefix)
+		out.String(string(in.UserID))
+	}
+	out.RawByte('}')
+}
+
+// MarshalJSON supports json.Marshaler interface
+func (v Order) MarshalJSON() ([]byte, error) {
+	w := jwriter.Writer{}
+	easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto1(&w, v)
+	return w.Buffer.BuildBytes(), w.Error
+}
+
+// MarshalEasyJSON supports easyjson.Marshaler interface
+func (v Order) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto1(w, v)
+}
+
+// UnmarshalJSON supports json.Unmarshaler interface
+func (v *Order) UnmarshalJSON(data []byte) error {
+	r := jlexer.Lexer{Data: data}
+	easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto1(&r, v)
+	return r.Error()
+}
+
+// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
+func (v *Order) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto1(l, v)
+}
+func easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto2(in *jlexer.Lexer, out *Login) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -130,7 +210,7 @@ func easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto1(in *jlexer
 		in.Consumed()
 	}
 }
-func easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto1(out *jwriter.Writer, in Login) {
+func easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto2(out *jwriter.Writer, in Login) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -150,23 +230,23 @@ func easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto1(out *jwrit
 // MarshalJSON supports json.Marshaler interface
 func (v Login) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto1(&w, v)
+	easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto2(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Login) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto1(w, v)
+	easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto2(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Login) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto1(&r, v)
+	easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto2(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Login) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto1(l, v)
+	easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto2(l, v)
 }

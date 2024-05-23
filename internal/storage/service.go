@@ -9,12 +9,13 @@ import (
 	"github.com/ajugalushkin/gofer-mart/internal/auth"
 	"github.com/ajugalushkin/gofer-mart/internal/database"
 	"github.com/ajugalushkin/gofer-mart/internal/dto"
+	"github.com/ajugalushkin/gofer-mart/internal/storage/order"
 	"github.com/ajugalushkin/gofer-mart/internal/storage/user"
 	"github.com/ajugalushkin/gofer-mart/internal/userrors"
 )
 
-// var defaultStorage Storage
 var defaultUserStorage user.Repository
+var defaultOrderStorage order.Repository
 
 func Init(ctx context.Context) {
 	cfg := config.FlagsFromContext(ctx)
@@ -24,6 +25,7 @@ func Init(ctx context.Context) {
 		//log.Error("storage.GetStorage Error:", zap.Error(err))
 		//}
 		defaultUserStorage = user.NewRepository(db)
+		defaultOrderStorage = order.NewRepository(db)
 	}
 }
 
@@ -33,6 +35,7 @@ func AddNewUser(ctx context.Context, user dto.User) error {
 	if err != nil {
 		return err
 	}
+
 	return defaultUserStorage.AddNewUser(ctx, user)
 }
 
@@ -46,4 +49,14 @@ func LoginUser(ctx context.Context, user dto.User) error {
 		return errors.Wrapf(userrors.ErrorIncorrectLoginPassword, "%s", userrors.ErrorIncorrectLoginPassword)
 	}
 	return nil
+}
+
+func AddNewOrder(ctx context.Context, order string, login string) error {
+	user, err := defaultUserStorage.GetUser(ctx, dto.User{Login: login})
+	if err != nil {
+		return err
+	}
+
+	return defaultOrderStorage.AddNewOrder(ctx, dto.Order{OrderNumber: order,
+		UserID: user.ID})
 }
