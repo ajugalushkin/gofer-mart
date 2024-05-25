@@ -29,7 +29,7 @@ services:
       - gofermart-network
 
   pgadmin:
-    image: dpage/pgadmin4:8.5
+    image: dpage/pgadmin4:8.6
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-O", "-", "http://localhost:80/misc/ping"]

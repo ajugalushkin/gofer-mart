@@ -1,10 +1,10 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE Users (
-    User_ID BIGSERIAL NOT NULL ,
+    ID BIGSERIAL NOT NULL ,
     Login VARCHAR(250) UNIQUE,
     Password_Hash VARCHAR(250),
-    PRIMARY KEY (User_ID)
+    PRIMARY KEY (ID)
 );
 -- +goose StatementEnd
 

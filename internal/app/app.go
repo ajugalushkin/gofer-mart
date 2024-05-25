@@ -32,10 +32,11 @@ func (a App) Routes(r *echo.Echo) {
 	r.POST("/api/user/login", a.login)
 
 	r.POST("/api/user/orders", a.authorized(a.postOrders))
-	r.POST("/api/user/balance/withdraw", a.postBalanceWithdraw)
+	r.GET("/api/user/orders", a.authorized(a.getOrders))
 
-	r.GET("/api/user/orders", a.getOrders)
+	r.POST("/api/user/balance/withdraw", a.postBalanceWithdraw)
 	r.GET("/api/user/balance", a.getBalance)
+
 	r.GET("/api/user/withdrawals", a.getWithdrawals)
 }
 
@@ -141,7 +142,18 @@ func (a App) postOrders(echoCtx echo.Context) error {
 }
 
 func (a App) getOrders(echoCtx echo.Context) error {
-	return nil
+	cookie, err := echoCtx.Cookie(cookieName)
+	login := cookies.GetLogin(a.ctx, cookie.Value)
+	if err != nil {
+		return echoCtx.JSON(http.StatusUnauthorized, err.Error())
+	}
+
+	orderList, err := storage.GetOrders(a.ctx, login.Login)
+	if err != nil {
+		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return echoCtx.JSON(http.StatusOK, orderList)
 }
 
 func (a App) getBalance(echoCtx echo.Context) error {

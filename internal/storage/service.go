@@ -57,6 +57,14 @@ func AddNewOrder(ctx context.Context, order string, login string) error {
 		return err
 	}
 
-	return defaultOrderStorage.AddNewOrder(ctx, dto.Order{OrderNumber: order,
+	return defaultOrderStorage.AddNewOrder(ctx, dto.Order{Number: order,
 		UserID: user.ID})
+}
+
+func GetOrders(ctx context.Context, login string) (*dto.OrderList, error) {
+	user, err := defaultUserStorage.GetUser(ctx, dto.User{Login: login})
+	if err != nil {
+		return &dto.OrderList{}, err
+	}
+	return defaultOrderStorage.GetOrdersByUser(ctx, user.ID)
 }

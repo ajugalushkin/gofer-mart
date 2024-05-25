@@ -2,6 +2,7 @@ package order
 
 import (
 	"context"
+	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/jackc/pgerrcode"
@@ -16,7 +17,7 @@ import (
 
 type Repository interface {
 	AddNewOrder(ctx context.Context, user dto.Order) error
-	//GetUser(ctx context.Context, user dto.User) (*dto.User, error)
+	GetOrdersByUser(ctx context.Context, userID string) (*dto.OrderList, error)
 }
 
 func NewRepository(db *sqlx.DB) Repository {
@@ -34,12 +35,14 @@ func (r *repo) AddNewOrder(ctx context.Context, order dto.Order) error {
 	err = database.WithTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		sb := squirrel.StatementBuilder.
 			Insert("orders").
-			Columns("order_number", "user_id").
+			Columns("number", "uploaded_at", "status", "user_id").
 			PlaceholderFormat(squirrel.Dollar).
 			RunWith(r.db)
 
 		sb = sb.Values(
-			order.OrderNumber,
+			order.Number,
+			time.Now(),
+			"NEW",
 			order.UserID,
 		)
 
@@ -49,20 +52,20 @@ func (r *repo) AddNewOrder(ctx context.Context, order dto.Order) error {
 
 	if err != nil {
 		if pgErr, ok := errors.Unwrap(errors.Unwrap(err)).(*pgconn.PgError); ok && pgErr.Code == pgerrcode.UniqueViolation {
-			err := r.getOrderByUser(ctx, order.OrderNumber, order.UserID)
+			err := r.getOrderByUser(ctx, order.Number, order.UserID)
 			if err != nil {
 				return errors.Wrapf(
 					userrors.ErrorOrderAlreadyUploadedAnotherUser,
 					"%s %s",
 					userrors.ErrorOrderAlreadyUploadedAnotherUser,
-					order.OrderNumber,
+					order.Number,
 				)
 			}
 			return errors.Wrapf(
 				userrors.ErrorOrderAlreadyUploadedThisUser,
 				"%s %s",
 				userrors.ErrorOrderAlreadyUploadedThisUser,
-				order.OrderNumber,
+				order.Number,
 			)
 		}
 		return errors.Wrap(err, "repository.AddNewOrder")
@@ -78,9 +81,9 @@ func (r *repo) getOrderByUser(ctx context.Context, orderNumber string, userID st
 
 	err = database.WithTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		sb := squirrel.StatementBuilder.
-			Select("order_id", "order_number", "user_id").
+			Select("id", "number", "user_id").
 			From("orders").
-			Where(squirrel.Eq{"order_number": orderNumber, "user_id": userID}).
+			Where(squirrel.Eq{"number": orderNumber, "user_id": userID}).
 			PlaceholderFormat(squirrel.Dollar).
 			RunWith(r.db)
 
@@ -96,4 +99,33 @@ func (r *repo) getOrderByUser(ctx context.Context, orderNumber string, userID st
 		return errors.Wrap(err, "repository.getOrderByUser")
 	}
 	return nil
+}
+
+func (r *repo) GetOrdersByUser(ctx context.Context, userID string) (*dto.OrderList, error) {
+	var (
+		err       error
+		orderList dto.OrderList
+	)
+
+	err = database.WithTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
+		sb := squirrel.StatementBuilder.
+			Select("id", "number", "uploaded_at", "status", "user_id").
+			From("orders").
+			OrderBy("uploaded_at DESC").
+			Where(squirrel.Eq{"user_id": userID}).
+			PlaceholderFormat(squirrel.Dollar).
+			RunWith(r.db)
+
+		query, args, err := sb.ToSql()
+		if err != nil {
+			return err
+		}
+
+		return r.db.SelectContext(ctx, &orderList, query, args...)
+	})
+
+	if err != nil {
+		return &orderList, errors.Wrap(err, "repository.GetOrdersByUser")
+	}
+	return &orderList, nil
 }

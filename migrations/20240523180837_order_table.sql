@@ -1,11 +1,13 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE Orders (
-    Order_ID BIGSERIAL NOT NULL,
-    Order_Number BIGSERIAL UNIQUE,
+    ID BIGSERIAL NOT NULL,
+    Number BIGSERIAL UNIQUE,
+    Uploaded_At timestamp default NULL,
+    Status VARCHAR(20),
     User_ID int,
-    PRIMARY KEY (Order_ID),
-    FOREIGN KEY (User_ID) REFERENCES Users(User_ID)
+    PRIMARY KEY (ID),
+    FOREIGN KEY (User_ID) REFERENCES Users(ID)
 );
 -- +goose StatementEnd
 
