@@ -8,6 +8,9 @@ on:
       - main
       - master
 
+env:
+  TOKEN_KEY: ${{secrets.TOKEN_KEY}}
+
 jobs:
 
   build:
