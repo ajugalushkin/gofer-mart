@@ -125,7 +125,7 @@ func (a App) authorized(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(echoCtx echo.Context) error {
 		cookie, err := echoCtx.Cookie(cookieName)
 		if err != nil {
-			return echoCtx.JSON(http.StatusBadRequest, err.Error())
+			return echoCtx.JSON(http.StatusUnauthorized, err.Error())
 		}
 
 		if _, ok := a.cache[cookie.Value]; !ok {
