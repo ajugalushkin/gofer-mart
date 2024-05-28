@@ -15,13 +15,11 @@ func ClearExpiredResult(q *OrderQueue) {
 	go func() {
 		timer := time.NewTicker(time.Second)
 		for {
-			select {
-			case <-timer.C:
-				q.queue.Range(func(key, value interface{}) bool {
-					q.queue.Delete(key)
-					return true
-				})
-			}
+			<-timer.C
+			q.queue.Range(func(key, value interface{}) bool {
+				q.queue.Delete(key)
+				return true
+			})
 		}
 	}()
 }
