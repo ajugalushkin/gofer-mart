@@ -13,12 +13,13 @@ import (
 
 	"github.com/ajugalushkin/gofer-mart/internal/database"
 	"github.com/ajugalushkin/gofer-mart/internal/dto"
+	"github.com/ajugalushkin/gofer-mart/internal/logger"
 	"github.com/ajugalushkin/gofer-mart/internal/userrors"
 )
 
 type Repository interface {
 	AddNewUser(ctx context.Context, user dto.User) error
-	GetUser(ctx context.Context, user dto.User) (*dto.User, error)
+	GetUser(ctx context.Context, user string) (*dto.User, error)
 }
 
 func NewRepository(db *sqlx.DB) Repository {
@@ -36,7 +37,7 @@ func (r *repo) AddNewUser(ctx context.Context, user dto.User) error {
 	err = database.WithTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		sb := squirrel.StatementBuilder.
 			Insert("users").
-			Columns("login", "password_hash").
+			Columns("login", "password").
 			PlaceholderFormat(squirrel.Dollar).
 			RunWith(r.db)
 
@@ -51,14 +52,16 @@ func (r *repo) AddNewUser(ctx context.Context, user dto.User) error {
 
 	if err != nil {
 		if pgErr, ok := errors.Unwrap(errors.Unwrap(err)).(*pgconn.PgError); ok && pgErr.Code == pgerrcode.UniqueViolation {
+			logger.LogFromContext(ctx).Debug("repository.AddNewUser: User already exists")
 			return errors.Wrapf(userrors.ErrorDuplicateLogin, "%s %s", userrors.ErrorDuplicateLogin, user.Login)
 		}
+		logger.LogFromContext(ctx).Debug("repository.AddNewUser: Unknown Error")
 		return errors.Wrap(err, "repository.AddNewUser")
 	}
 	return nil
 }
 
-func (r *repo) GetUser(ctx context.Context, user dto.User) (*dto.User, error) {
+func (r *repo) GetUser(ctx context.Context, user string) (*dto.User, error) {
 	var (
 		err             error
 		storageUserList []dto.User
@@ -67,9 +70,9 @@ func (r *repo) GetUser(ctx context.Context, user dto.User) (*dto.User, error) {
 
 	err = database.WithTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		sb := squirrel.StatementBuilder.
-			Select("id", "login", "password_hash").
+			Select("login", "password_hash").
 			From("users").
-			Where("login = ?", user.Login).
+			Where("login = ?", user).
 			PlaceholderFormat(squirrel.Dollar).
 			RunWith(r.db)
 
@@ -82,6 +85,7 @@ func (r *repo) GetUser(ctx context.Context, user dto.User) (*dto.User, error) {
 	})
 
 	if err != nil {
+		logger.LogFromContext(ctx).Debug("repository.GetUser: Select Error")
 		return &storageUser, errors.Wrap(err, "repository.GetUser")
 	}
 	storageUser = storageUserList[0]

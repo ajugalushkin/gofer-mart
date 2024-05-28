@@ -48,3 +48,42 @@ services:
       - ${PGADMIN_PORT:-7080}:80
     networks:
       - gofermart-network
+
+  gophermart-api:
+    depends_on:
+      - postgres
+    restart: always
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    image: gophermart-api:v1.0
+    container_name: gophermart-api
+    hostname: gophermart-api
+    networks:
+      - gofermart-network
+    ports:
+      - 80:8080
+    environment:
+      - DATABASE_URI=${DATABASE_URI:?Please configure DATABASE_URI in the .env file}
+      - ACCRUAL_SYSTEM_ADDRESS=${ACCRUAL_SYSTEM_ADDRESS:?Please configure ACCRUAL_SYSTEM_ADDRESS in the .env file}
+      - NUM_WORKERS=${NUM_WORKERS:?Please configure NUM_WORKERS in the .env file}
+      - LOG_LEVEL=${LOG_LEVEL:?Please configure LOG_LEVEL in the .env file}
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  accrual-api:
+    restart: always
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    image: accrual-api
+    container_name: accrual_client-api
+    hostname: accrual_client-api
+    networks:
+      - gofermart-network
+    ports:
+      - 81:8080
+    deploy:
+      restart_policy:
+        condition: on-failure

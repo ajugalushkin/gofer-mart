@@ -10,22 +10,24 @@ import (
 	"github.com/ajugalushkin/gofer-mart/config"
 	"github.com/ajugalushkin/gofer-mart/internal/auth"
 	"github.com/ajugalushkin/gofer-mart/internal/dto"
+	"github.com/ajugalushkin/gofer-mart/internal/logger"
 )
 
 type Claims struct {
 	jwt.RegisteredClaims
-	Login dto.Login
+	Login dto.User
 }
 
 const TokenExp = time.Hour * 3
 
-func buildJWTString(ctx context.Context, login dto.Login) (string, error) {
+func buildJWTString(ctx context.Context, login dto.User) string {
 	cfg := config.FlagsFromContext(ctx)
 
 	var err error
 	login.Password, err = auth.HashPassword(login.Password)
 	if err != nil {
-		return "", err
+		logger.LogFromContext(ctx).Debug("cookies.buildJWTString: unable to hash password")
+		return ""
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
@@ -37,37 +39,31 @@ func buildJWTString(ctx context.Context, login dto.Login) (string, error) {
 
 	tokenString, err := token.SignedString([]byte(cfg.TokenKey))
 	if err != nil {
-		return "", err
+		logger.LogFromContext(ctx).Debug("cookies.buildJWTString: unable to sign token")
+		return ""
 	}
 
-	return tokenString, nil
+	return tokenString
 }
 
-func GetLogin(ctx context.Context, tokenString string) *dto.Login {
+func GetLogin(ctx context.Context, tokenString string) *dto.User {
 	cfg := config.FlagsFromContext(ctx)
 	claims := &Claims{}
 	_, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
 		return []byte(cfg.TokenKey), nil
 	})
 	if err != nil {
-		return &dto.Login{}
+		logger.LogFromContext(ctx).Debug("cookies.GetLogin: unable to parse token")
+		return &dto.User{}
 	}
 
 	return &claims.Login
 }
 
-func Create(ctx context.Context, nameCookie string, login dto.Login) *http.Cookie {
+func Create(ctx context.Context, nameCookie string, login dto.User) *http.Cookie {
 	cookie := new(http.Cookie)
 	cookie.Name = nameCookie
-	cookie.Value, _ = buildJWTString(ctx, login)
+	cookie.Value = buildJWTString(ctx, login)
 	cookie.Expires = time.Now().Add(TokenExp)
 	return cookie
 }
-
-//func ReadCookieData(ctx context.Context, echoCtx echo.Context, name string) (*dto.Login, error) {
-//	cookie, err := echoCtx.Cookie(name)
-//	if err != nil {
-//		return &dto.Login{}, err
-//	}
-//	return getLogin(ctx, cookie.Value), nil
-//}

@@ -13,6 +13,8 @@ type AppConfig struct {
 	DataBaseURI          string `env:"DATABASE_URI"`
 	AccrualSystemAddress string `env:"ACCRUAL_SYSTEM_ADDRESS"`
 	TokenKey             string `env:"TOKEN_KEY"`
+	NumOfWorkers         int    `env:"NUM_WORKERS"`
+	LogLevel             string `env:"LOG_LEVEL"`
 }
 
 func init() {
@@ -20,6 +22,8 @@ func init() {
 	viper.SetDefault("DataBase_URI", "")
 	viper.SetDefault("AccrualSystemAddress", "")
 	viper.SetDefault("TokenKey", "")
+	viper.SetDefault("NumOfWorkers", 10)
+	viper.SetDefault("LogLevel", "info")
 }
 
 func bindToEnv() {
@@ -28,13 +32,16 @@ func bindToEnv() {
 	_ = viper.BindEnv("DataBase_URI")
 	_ = viper.BindEnv("AccrualSystemAddress")
 	_ = viper.BindEnv("TokenKey")
+	_ = viper.BindEnv("NumOfWorkers")
+	_ = viper.BindEnv("LogLevel")
 }
 
 func bindToFlag() {
 	flag.String("a", "localhost:8080", "address and port to run server")
 	flag.String("d", "postgres://postgres:postgres@localhost/postgres?sslmode=disable",
 		"database connection address")
-	flag.String("r", "", "address of the accrual calculation system")
+	flag.String("r", "", "address of the accrual_client calculation system")
+	flag.String("l", "info", "log level")
 
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	pflag.Parse()
@@ -46,10 +53,12 @@ func ReadConfig() *AppConfig {
 	bindToEnv()
 
 	result := &AppConfig{
-		RunAddr: viper.GetString("RunAddr"),
-		//FlagLogLevel: viper.GetString("FlagLogLevel"),
+		RunAddr:              viper.GetString("RunAddr"),
 		DataBaseURI:          viper.GetString("DataBase_URI"),
 		AccrualSystemAddress: viper.GetString("AccrualSystemAddress"),
+		TokenKey:             viper.GetString("TokenKey"),
+		NumOfWorkers:         viper.GetInt("NumOfWorkers"),
+		LogLevel:             viper.GetString("LogLevel"),
 	}
 	return result
 }
