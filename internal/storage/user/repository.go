@@ -70,7 +70,7 @@ func (r *repo) GetUser(ctx context.Context, user string) (*dto.User, error) {
 
 	err = database.WithTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		sb := squirrel.StatementBuilder.
-			Select("login", "password_hash").
+			Select("login", "password").
 			From("users").
 			Where("login = ?", user).
 			PlaceholderFormat(squirrel.Dollar).
