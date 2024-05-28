@@ -62,23 +62,23 @@ func LoginUser(ctx context.Context, user dto.User) error {
 }
 
 func AddNewOrder(ctx context.Context, orderNumber string, login string) error {
-	order := dto.Order{Number: orderNumber, UploadedAt: time.Now(), UserID: login}
-	err := defaultOrderStorage.AddNewOrder(ctx, order)
+	newOrder := dto.Order{Number: orderNumber, UploadedAt: time.Now(), UserID: login}
+	err := defaultOrderStorage.AddNewOrder(ctx, newOrder)
 	if err != nil {
-		logger.LogFromContext(ctx).Debug("service.AddNewOrder: Failed to add new order")
+		logger.LogFromContext(ctx).Debug("service.AddNewOrder: Failed to add new newOrder")
 		return err
 	}
 
-	queue.AddOrder(&order)
+	queue.AddOrder(&newOrder)
 	return nil
 }
 
 func GetOrders(ctx context.Context, login string) (*dto.OrderList, error) {
-	user, err := defaultUserStorage.GetUser(ctx, login)
+	userData, err := defaultUserStorage.GetUser(ctx, login)
 	if err != nil {
 		return &dto.OrderList{}, err
 	}
-	return defaultOrderStorage.GetOrderList(ctx, user.Login)
+	return defaultOrderStorage.GetOrderList(ctx, userData.Login)
 }
 
 func UpdateOrder(ctx context.Context, order dto.Order) error {
@@ -99,9 +99,9 @@ func GetBalance(ctx context.Context, login string) (*dto.Balance, error) {
 	}
 
 	var orders = make([]string, 0)
-	for _, order := range *orderList {
-		balance.Current = balance.Current + order.Accrual
-		orders = append(orders, order.Number)
+	for _, orderItem := range *orderList {
+		balance.Current = balance.Current + orderItem.Accrual
+		orders = append(orders, orderItem.Number)
 	}
 
 	withdrawalList, err := defaultWithdrawalStorage.GetWithdrawalList(ctx, orders)
@@ -109,8 +109,8 @@ func GetBalance(ctx context.Context, login string) (*dto.Balance, error) {
 		return &balance, err
 	}
 
-	for _, withdrawal := range *withdrawalList {
-		balance.Withdrawn = balance.Withdrawn + withdrawal.Sum
+	for _, withdrawalItem := range *withdrawalList {
+		balance.Withdrawn = balance.Withdrawn + withdrawalItem.Sum
 	}
 
 	return &balance, nil
@@ -146,8 +146,8 @@ func GetWithdrawalList(ctx context.Context, login string) (*dto.WithdrawalList, 
 	}
 
 	var orders = make([]string, 0)
-	for _, order := range *orderList {
-		orders = append(orders, order.Number)
+	for _, orderItem := range *orderList {
+		orders = append(orders, orderItem.Number)
 	}
 
 	withdrawalList, err := defaultWithdrawalStorage.GetWithdrawalList(ctx, orders)

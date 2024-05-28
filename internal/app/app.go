@@ -148,6 +148,9 @@ func (a App) postOrders(echoCtx echo.Context) error {
 	}
 
 	cookie, err := echoCtx.Cookie(cookieName)
+	if err != nil {
+		return echoCtx.JSON(http.StatusUnauthorized, err.Error())
+	}
 	login := cookies.GetLogin(a.ctx, cookie.Value)
 
 	err = storage.AddNewOrder(a.ctx, order, login.Login)
@@ -165,10 +168,10 @@ func (a App) postOrders(echoCtx echo.Context) error {
 
 func (a App) getOrders(echoCtx echo.Context) error {
 	cookie, err := echoCtx.Cookie(cookieName)
-	login := cookies.GetLogin(a.ctx, cookie.Value)
 	if err != nil {
 		return echoCtx.JSON(http.StatusUnauthorized, err.Error())
 	}
+	login := cookies.GetLogin(a.ctx, cookie.Value)
 
 	orderList, err := storage.GetOrders(a.ctx, login.Login)
 	if err != nil {
@@ -180,10 +183,10 @@ func (a App) getOrders(echoCtx echo.Context) error {
 
 func (a App) getBalance(echoCtx echo.Context) error {
 	cookie, err := echoCtx.Cookie(cookieName)
-	login := cookies.GetLogin(a.ctx, cookie.Value)
 	if err != nil {
 		return echoCtx.JSON(http.StatusUnauthorized, err.Error())
 	}
+	login := cookies.GetLogin(a.ctx, cookie.Value)
 
 	balance, err := storage.GetBalance(a.ctx, login.Login)
 	if err != nil {
@@ -199,10 +202,10 @@ func (a App) postBalanceWithdraw(echoCtx echo.Context) error {
 	}
 
 	cookie, err := echoCtx.Cookie(cookieName)
-	login := cookies.GetLogin(a.ctx, cookie.Value)
 	if err != nil {
 		return echoCtx.JSON(http.StatusUnauthorized, err.Error())
 	}
+	login := cookies.GetLogin(a.ctx, cookie.Value)
 
 	withdraw := dto.Withdraw{}
 	err = withdraw.UnmarshalJSON(body)
@@ -225,10 +228,11 @@ func (a App) postBalanceWithdraw(echoCtx echo.Context) error {
 
 func (a App) getWithdrawals(echoCtx echo.Context) error {
 	cookie, err := echoCtx.Cookie(cookieName)
-	login := cookies.GetLogin(a.ctx, cookie.Value)
 	if err != nil {
 		return echoCtx.JSON(http.StatusUnauthorized, err.Error())
 	}
+	login := cookies.GetLogin(a.ctx, cookie.Value)
+
 	list, err := storage.GetWithdrawalList(a.ctx, login.Login)
 	if err != nil {
 		return echoCtx.JSON(http.StatusNoContent, err.Error())

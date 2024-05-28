@@ -40,7 +40,7 @@ func doWork(ctx context.Context) {
 		return
 	}
 
-	if newAccrual.Status != "INVALID" || newAccrual.Status != "PROCESSED" {
+	if newAccrual.Status != "INVALID" && newAccrual.Status != "PROCESSED" {
 		logger.LogFromContext(ctx).Debug("worker.doWork add order to queue")
 		queue.AddOrder(order)
 	}
