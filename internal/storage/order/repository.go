@@ -57,7 +57,7 @@ func (r *repo) AddNewOrder(ctx context.Context, order dto.Order) error {
 
 	if err != nil {
 		if pgErr, ok := errors.Unwrap(errors.Unwrap(err)).(*pgconn.PgError); ok && pgErr.Code == pgerrcode.UniqueViolation {
-			err := r.getOrderByUser(ctx, order.Number, order.UserID)
+			err := r.CheckOrderExists(ctx, order.Number, order.UserID)
 			if err != nil {
 				logger.LogFromContext(ctx).Debug("repository.AddNewOrder: order already uploaded another user")
 				return errors.Wrapf(
