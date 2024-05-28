@@ -139,7 +139,7 @@ func (r *repo) CheckOrderExists(ctx context.Context, orderNumber string, login s
 
 	err = database.WithTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		sb := squirrel.StatementBuilder.
-			Select("id", "number", "user_id").
+			Select("number", "user_id").
 			From("orders").
 			Where(squirrel.Eq{"number": orderNumber, "user_id": login}).
 			PlaceholderFormat(squirrel.Dollar).
