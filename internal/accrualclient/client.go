@@ -1,4 +1,4 @@
-package accrual_client
+package accrualclient
 
 import (
 	"context"
@@ -18,7 +18,7 @@ import (
 type Accrual struct {
 	Order   string  `json:"order"`
 	Status  string  `json:"status"`
-	Accrual float64 `json:"accrual_client"`
+	Accrual float64 `json:"accrualclient"`
 }
 
 func GetAccrual(ctx context.Context, number string) (*Accrual, error) {
@@ -31,12 +31,12 @@ func GetAccrual(ctx context.Context, number string) (*Accrual, error) {
 
 	resp, err := req.Get(fmt.Sprintf("/api/orders/%s", number))
 	if err != nil {
-		logger.LogFromContext(ctx).Debug("accrual_client.GetAccrual Error:",
+		logger.LogFromContext(ctx).Debug("accrualclient.GetAccrual Error:",
 			zap.Error(err))
 		return &accrual, err
 	}
 
-	logger.LogFromContext(ctx).Debug("accrual_client.GetAccrual Status:",
+	logger.LogFromContext(ctx).Debug("accrualclient.GetAccrual Status:",
 		zap.String("Status Code", strconv.Itoa(resp.StatusCode())),
 		zap.String("Status", resp.Status()))
 

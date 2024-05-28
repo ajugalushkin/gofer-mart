@@ -74,21 +74,12 @@ func AddNewOrder(ctx context.Context, orderNumber string, login string) error {
 }
 
 func GetOrders(ctx context.Context, login string) (*dto.OrderList, error) {
-	userData, err := defaultUserStorage.GetUser(ctx, login)
-	if err != nil {
-		return &dto.OrderList{}, err
-	}
-	return defaultOrderStorage.GetOrderList(ctx, userData.Login)
+	return defaultOrderStorage.GetOrderList(ctx, login)
 }
 
 func UpdateOrder(ctx context.Context, order dto.Order) error {
 	return defaultOrderStorage.UpdateOrder(ctx, order)
 }
-
-//func AddAccrual(ctx context.Context, accrual float64, order string) error {
-//	return defaultAccrualStorage.AddNewAccrual(ctx,
-//		dto.Accrual{Accrual: accrual, ProcessedAt: time.Now(), OrderID: order})
-//}
 
 func GetBalance(ctx context.Context, login string) (*dto.Balance, error) {
 	var balance dto.Balance

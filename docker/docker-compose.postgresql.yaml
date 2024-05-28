@@ -78,8 +78,8 @@ services:
       context: ../
       dockerfile: ./docker/Dockerfile
     image: accrual-api
-    container_name: accrual_client-api
-    hostname: accrual_client-api
+    container_name: accrualclient-api
+    hostname: accrualclient-api
     networks:
       - gofermart-network
     ports:

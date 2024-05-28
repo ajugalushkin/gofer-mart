@@ -40,7 +40,7 @@ func bindToFlag() {
 	flag.String("a", "localhost:8080", "address and port to run server")
 	flag.String("d", "postgres://postgres:postgres@localhost/postgres?sslmode=disable",
 		"database connection address")
-	flag.String("r", "", "address of the accrual_client calculation system")
+	flag.String("r", "", "address of the accrualclient calculation system")
 	flag.String("l", "info", "log level")
 
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)

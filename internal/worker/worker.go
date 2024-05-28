@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/ajugalushkin/gofer-mart/internal/accrual_client"
+	"github.com/ajugalushkin/gofer-mart/internal/accrualclient"
 	"github.com/ajugalushkin/gofer-mart/internal/dto"
 	"github.com/ajugalushkin/gofer-mart/internal/logger"
 	"github.com/ajugalushkin/gofer-mart/internal/queue"
@@ -19,10 +19,10 @@ func doWork(ctx context.Context) {
 		return
 	}
 
-	newAccrual, err := accrual_client.GetAccrual(ctx, order.Number)
+	newAccrual, err := accrualclient.GetAccrual(ctx, order.Number)
 	if err != nil {
 		queue.AddOrder(order)
-		logger.LogFromContext(ctx).Debug("worker.doWork accrual_client.GetAccrual() failed")
+		logger.LogFromContext(ctx).Debug("worker.doWork accrualclient.GetAccrual() failed")
 		time.Sleep(100 * time.Millisecond)
 		return
 	}

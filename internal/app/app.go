@@ -175,7 +175,7 @@ func (a App) getOrders(echoCtx echo.Context) error {
 
 	orderList, err := storage.GetOrders(a.ctx, login.Login)
 	if err != nil {
-		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
+		return echoCtx.JSON(http.StatusNoContent, err.Error())
 	}
 
 	return echoCtx.JSON(http.StatusOK, orderList)
