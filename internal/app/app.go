@@ -51,6 +51,7 @@ func (a App) Routes(r *echo.Echo) {
 	r.GET("/api/user/accrual", a.getBalance)
 
 	r.GET("/api/user/withdrawal", a.getWithdrawals)
+	r.POST("/api/user/balance/withdraw", a.postBalanceWithdraw)
 
 	//Middleware
 	r.Use(logger.MiddlewareLogger(a.ctx))
