@@ -36,14 +36,14 @@ func easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto(in *jlexer.
 			continue
 		}
 		switch key {
+		case "Number":
+			out.Number = string(in.String())
 		case "Sum":
 			out.Sum = float64(in.Float64())
 		case "ProcessedAt":
 			if data := in.Raw(); in.Ok() {
 				in.AddError((out.ProcessedAt).UnmarshalJSON(data))
 			}
-		case "OrderID":
-			out.OrderID = string(in.String())
 		default:
 			in.SkipRecursive()
 		}
@@ -59,19 +59,19 @@ func easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto(out *jwrite
 	first := true
 	_ = first
 	{
-		const prefix string = ",\"Sum\":"
+		const prefix string = ",\"Number\":"
 		out.RawString(prefix[1:])
+		out.String(string(in.Number))
+	}
+	{
+		const prefix string = ",\"Sum\":"
+		out.RawString(prefix)
 		out.Float64(float64(in.Sum))
 	}
 	{
 		const prefix string = ",\"ProcessedAt\":"
 		out.RawString(prefix)
 		out.Raw((in.ProcessedAt).MarshalJSON())
-	}
-	{
-		const prefix string = ",\"OrderID\":"
-		out.RawString(prefix)
-		out.String(string(in.OrderID))
 	}
 	out.RawByte('}')
 }
@@ -121,7 +121,7 @@ func easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto1(in *jlexer
 		case "order":
 			out.Order = string(in.String())
 		case "sum":
-			out.Sum = int(in.Int())
+			out.Sum = float64(in.Float64())
 		default:
 			in.SkipRecursive()
 		}
@@ -144,7 +144,7 @@ func easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto1(out *jwrit
 	{
 		const prefix string = ",\"sum\":"
 		out.RawString(prefix)
-		out.Int(int(in.Sum))
+		out.Float64(float64(in.Sum))
 	}
 	out.RawByte('}')
 }
