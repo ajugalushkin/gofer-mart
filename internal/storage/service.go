@@ -86,6 +86,7 @@ func GetBalance(ctx context.Context, login string) (*dto.Balance, error) {
 
 	orderList, err := defaultOrderStorage.GetOrderList(ctx, login)
 	if err != nil {
+		logger.LogFromContext(ctx).Info("service.GetBalance: Failed to get order list")
 		return &balance, err
 	}
 
@@ -97,6 +98,7 @@ func GetBalance(ctx context.Context, login string) (*dto.Balance, error) {
 
 	withdrawalList, err := defaultWithdrawalStorage.GetWithdrawalList(ctx, orders)
 	if err != nil {
+		logger.LogFromContext(ctx).Info("service.GetBalance: Failed to get withdrawal list")
 		return &balance, err
 	}
 
