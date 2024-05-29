@@ -13,7 +13,7 @@ EXPOSE 8080
 USER nonroot:nonroot
 ENTRYPOINT ["/gophermart-api"]
 
-FROM gcr.io/distroless/base-debian11
-ADD ../cmd/accrual ./
-EXPOSE 8080
-ENTRYPOINT ["/accrual"]
+#FROM gcr.io/distroless/base-debian11
+#ADD ../cmd/accrual ./
+#EXPOSE 8080
+#ENTRYPOINT ["/accrual"]

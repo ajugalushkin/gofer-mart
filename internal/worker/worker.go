@@ -8,6 +8,7 @@ import (
 	"github.com/ajugalushkin/gofer-mart/internal/dto"
 	"github.com/ajugalushkin/gofer-mart/internal/logger"
 	"github.com/ajugalushkin/gofer-mart/internal/queue"
+	"github.com/ajugalushkin/gofer-mart/internal/service"
 	"github.com/ajugalushkin/gofer-mart/internal/storage"
 )
 
@@ -27,7 +28,10 @@ func doWork(ctx context.Context) {
 		return
 	}
 
-	err = storage.UpdateOrder(ctx, dto.Order{
+	db := storage.ConnectFromContext(ctx)
+	newService := service.NewService(db)
+
+	err = newService.UpdateOrder(ctx, dto.Order{
 		Number:     newAccrual.Order,
 		UploadedAt: time.Time{},
 		Status:     newAccrual.Status,

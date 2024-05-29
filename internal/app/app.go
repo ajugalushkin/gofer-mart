@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 
@@ -16,20 +17,24 @@ import (
 	"github.com/ajugalushkin/gofer-mart/internal/cookies"
 	"github.com/ajugalushkin/gofer-mart/internal/dto"
 	"github.com/ajugalushkin/gofer-mart/internal/logger"
+	"github.com/ajugalushkin/gofer-mart/internal/service"
 	"github.com/ajugalushkin/gofer-mart/internal/storage"
 	"github.com/ajugalushkin/gofer-mart/internal/userrors"
 	"github.com/ajugalushkin/gofer-mart/internal/worker"
 )
 
 type App struct {
-	ctx   context.Context
-	cache map[string]dto.User
+	ctx     context.Context
+	cache   map[string]dto.User
+	service *service.Service
 }
 
 const cookieName string = "User"
 
-func NewApp(ctx context.Context) *App {
+func NewApp(ctx context.Context, db *sqlx.DB) *App {
 	cfg := config.FlagsFromContext(ctx)
+
+	ctx = storage.ContextWithConnect(ctx, db)
 	for i := 0; i < cfg.NumOfWorkers; i++ {
 		worker.Start(ctx)
 	}
@@ -37,7 +42,10 @@ func NewApp(ctx context.Context) *App {
 	log, _ := logger.Initialize(cfg.LogLevel)
 	ctx = logger.ContextWithLogger(ctx, log)
 
-	return &App{ctx, make(map[string]dto.User)}
+	return &App{
+		ctx,
+		make(map[string]dto.User),
+		service.NewService(db)}
 }
 
 func (a App) Routes(r *echo.Echo) {
@@ -75,7 +83,7 @@ func (a App) register(echoCtx echo.Context) error {
 		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	err = storage.AddNewUser(a.ctx, dto.User{
+	err = a.service.AddNewUser(a.ctx, dto.User{
 		Login:    loginData.Login,
 		Password: loginData.Password,
 	})
@@ -104,7 +112,7 @@ func (a App) login(echoCtx echo.Context) error {
 		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	err = storage.LoginUser(a.ctx, dto.User{
+	err = a.service.LoginUser(a.ctx, dto.User{
 		Login:    loginData.Login,
 		Password: loginData.Password,
 	})
@@ -154,7 +162,7 @@ func (a App) postOrders(echoCtx echo.Context) error {
 	}
 	login := cookies.GetLogin(a.ctx, cookie.Value)
 
-	err = storage.AddNewOrder(a.ctx, order, login.Login)
+	err = a.service.AddNewOrder(a.ctx, order, login.Login)
 	if err != nil {
 		if errors.Is(err, userrors.ErrorOrderAlreadyUploadedAnotherUser) {
 			return echoCtx.JSON(http.StatusConflict, err.Error())
@@ -174,7 +182,7 @@ func (a App) getOrders(echoCtx echo.Context) error {
 	}
 	login := cookies.GetLogin(a.ctx, cookie.Value)
 
-	orderList, err := storage.GetOrders(a.ctx, login.Login)
+	orderList, err := a.service.GetOrders(a.ctx, login.Login)
 	if err != nil {
 		return echoCtx.JSON(http.StatusNoContent, err.Error())
 	}
@@ -189,7 +197,7 @@ func (a App) getBalance(echoCtx echo.Context) error {
 	}
 	login := cookies.GetLogin(a.ctx, cookie.Value)
 
-	balance, err := storage.GetBalance(a.ctx, login.Login)
+	balance, err := a.service.GetBalance(a.ctx, login.Login)
 	if err != nil {
 		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -214,7 +222,7 @@ func (a App) postBalanceWithdraw(echoCtx echo.Context) error {
 		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	err = storage.AddNewWithdrawal(a.ctx, withdraw, login.Login)
+	err = a.service.AddNewWithdrawal(a.ctx, withdraw, login.Login)
 	if err != nil {
 		if errors.Is(err, userrors.ErrorInsufficientFunds) {
 			return echoCtx.JSON(http.StatusPaymentRequired, err.Error())
@@ -234,7 +242,7 @@ func (a App) getWithdrawals(echoCtx echo.Context) error {
 	}
 	login := cookies.GetLogin(a.ctx, cookie.Value)
 
-	list, err := storage.GetWithdrawalList(a.ctx, login.Login)
+	list, err := a.service.GetWithdrawalList(a.ctx, login.Login)
 	if err != nil {
 		return echoCtx.JSON(http.StatusNoContent, err.Error())
 	}

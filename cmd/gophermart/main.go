@@ -14,13 +14,18 @@ import (
 func main() {
 	cfg := config.ReadConfig()
 	ctx := config.ContextWithFlags(context.Background(), cfg)
-	storage.Init(ctx)
 
-	a := app.NewApp(ctx)
+	db, err := storage.Init(ctx)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer db.Close()
+
+	a := app.NewApp(ctx, db)
 	e := echo.New()
 	a.Routes(e)
 
-	err := e.Start(cfg.RunAddr)
+	err = e.Start(cfg.RunAddr)
 	if err != nil {
 		fmt.Println(err)
 	}

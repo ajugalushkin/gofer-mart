@@ -1,15 +1,13 @@
-package storage
+package service
 
 import (
 	"context"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
-	"go.uber.org/zap"
 
-	"github.com/ajugalushkin/gofer-mart/config"
 	"github.com/ajugalushkin/gofer-mart/internal/auth"
-	"github.com/ajugalushkin/gofer-mart/internal/database"
 	"github.com/ajugalushkin/gofer-mart/internal/dto"
 	"github.com/ajugalushkin/gofer-mart/internal/logger"
 	"github.com/ajugalushkin/gofer-mart/internal/queue"
@@ -19,24 +17,25 @@ import (
 	"github.com/ajugalushkin/gofer-mart/internal/userrors"
 )
 
-var defaultUserStorage user.Repository
-var defaultOrderStorage order.Repository
-var defaultWithdrawalStorage withdrawal.Repository
+//var defaultUserStorage user.Repository
+//var defaultOrderStorage order.Repository
+//var defaultWithdrawalStorage withdrawal.Repository
 
-func Init(ctx context.Context) {
-	cfg := config.FlagsFromContext(ctx)
-	if cfg.DataBaseURI != "" {
-		db, err := database.NewConnection("pgx", cfg.DataBaseURI)
-		if err != nil {
-			logger.LogFromContext(ctx).Debug("storage.Init", zap.Error(err))
-		}
-		defaultUserStorage = user.NewRepository(db)
-		defaultOrderStorage = order.NewRepository(db)
-		defaultWithdrawalStorage = withdrawal.NewRepository(db)
+type Service struct {
+	userRepo       user.Repository
+	orderRepo      order.Repository
+	withdrawalRepo withdrawal.Repository
+}
+
+func NewService(db *sqlx.DB) *Service {
+	return &Service{
+		userRepo:       user.NewRepository(db),
+		orderRepo:      order.NewRepository(db),
+		withdrawalRepo: withdrawal.NewRepository(db),
 	}
 }
 
-func AddNewUser(ctx context.Context, user dto.User) error {
+func (s *Service) AddNewUser(ctx context.Context, user dto.User) error {
 	var err error
 	user.Password, err = auth.HashPassword(user.Password)
 	if err != nil {
@@ -44,11 +43,11 @@ func AddNewUser(ctx context.Context, user dto.User) error {
 		return err
 	}
 
-	return defaultUserStorage.AddNewUser(ctx, user)
+	return s.userRepo.AddNewUser(ctx, user)
 }
 
-func LoginUser(ctx context.Context, user dto.User) error {
-	storageUser, err := defaultUserStorage.GetUser(ctx, user.Login)
+func (s *Service) LoginUser(ctx context.Context, user dto.User) error {
+	storageUser, err := s.userRepo.GetUser(ctx, user.Login)
 	if err != nil {
 		logger.LogFromContext(ctx).Debug("service.LoginUser: Failed to get user")
 		return err
@@ -61,9 +60,9 @@ func LoginUser(ctx context.Context, user dto.User) error {
 	return nil
 }
 
-func AddNewOrder(ctx context.Context, orderNumber string, login string) error {
+func (s *Service) AddNewOrder(ctx context.Context, orderNumber string, login string) error {
 	newOrder := dto.Order{Number: orderNumber, UploadedAt: time.Now(), UserID: login}
-	err := defaultOrderStorage.AddNewOrder(ctx, newOrder)
+	err := s.orderRepo.AddNewOrder(ctx, newOrder)
 	if err != nil {
 		logger.LogFromContext(ctx).Debug("service.AddNewOrder: Failed to add new newOrder")
 		return err
@@ -73,18 +72,18 @@ func AddNewOrder(ctx context.Context, orderNumber string, login string) error {
 	return nil
 }
 
-func GetOrders(ctx context.Context, login string) (*dto.OrderList, error) {
-	return defaultOrderStorage.GetOrderList(ctx, login)
+func (s *Service) GetOrders(ctx context.Context, login string) (*dto.OrderList, error) {
+	return s.orderRepo.GetOrderList(ctx, login)
 }
 
-func UpdateOrder(ctx context.Context, order dto.Order) error {
-	return defaultOrderStorage.UpdateOrder(ctx, order)
+func (s *Service) UpdateOrder(ctx context.Context, order dto.Order) error {
+	return s.orderRepo.UpdateOrder(ctx, order)
 }
 
-func GetBalance(ctx context.Context, login string) (*dto.Balance, error) {
+func (s *Service) GetBalance(ctx context.Context, login string) (*dto.Balance, error) {
 	var balance dto.Balance
 
-	orderList, err := defaultOrderStorage.GetOrderList(ctx, login)
+	orderList, err := s.orderRepo.GetOrderList(ctx, login)
 	if err != nil {
 		logger.LogFromContext(ctx).Info("service.GetBalance: Failed to get order list")
 		return &balance, err
@@ -96,7 +95,7 @@ func GetBalance(ctx context.Context, login string) (*dto.Balance, error) {
 		orders = append(orders, orderItem.Number)
 	}
 
-	withdrawalList, err := defaultWithdrawalStorage.GetWithdrawalList(ctx, orders)
+	withdrawalList, err := s.withdrawalRepo.GetWithdrawalList(ctx, orders)
 	if err != nil {
 		logger.LogFromContext(ctx).Info("service.GetBalance: Failed to get withdrawal list")
 		return &balance, err
@@ -109,8 +108,8 @@ func GetBalance(ctx context.Context, login string) (*dto.Balance, error) {
 	return &balance, nil
 }
 
-func AddNewWithdrawal(ctx context.Context, withdrawal dto.Withdraw, login string) error {
-	balance, err := GetBalance(ctx, login)
+func (s *Service) AddNewWithdrawal(ctx context.Context, withdrawal dto.Withdraw, login string) error {
+	balance, err := s.GetBalance(ctx, login)
 	if err != nil {
 		return err
 	}
@@ -119,21 +118,21 @@ func AddNewWithdrawal(ctx context.Context, withdrawal dto.Withdraw, login string
 			"%s", userrors.ErrorInsufficientFunds)
 	}
 
-	err = defaultOrderStorage.CheckOrderExists(ctx, withdrawal.Order, login)
+	err = s.orderRepo.CheckOrderExists(ctx, withdrawal.Order, login)
 	if err != nil {
 		return errors.Wrapf(userrors.ErrorIncorrectOrderNumber,
 			"%s", userrors.ErrorIncorrectOrderNumber)
 	}
 
-	return defaultWithdrawalStorage.AddNewWithdrawal(ctx,
+	return s.withdrawalRepo.AddNewWithdrawal(ctx,
 		dto.Withdrawal{
 			Number:      withdrawal.Order,
 			Sum:         withdrawal.Sum,
 			ProcessedAt: time.Now()})
 }
 
-func GetWithdrawalList(ctx context.Context, login string) (*dto.WithdrawalList, error) {
-	orderList, err := defaultOrderStorage.GetOrderList(ctx, login)
+func (s *Service) GetWithdrawalList(ctx context.Context, login string) (*dto.WithdrawalList, error) {
+	orderList, err := s.orderRepo.GetOrderList(ctx, login)
 	if err != nil {
 		return &dto.WithdrawalList{}, err
 	}
@@ -143,7 +142,7 @@ func GetWithdrawalList(ctx context.Context, login string) (*dto.WithdrawalList, 
 		orders = append(orders, orderItem.Number)
 	}
 
-	withdrawalList, err := defaultWithdrawalStorage.GetWithdrawalList(ctx, orders)
+	withdrawalList, err := s.withdrawalRepo.GetWithdrawalList(ctx, orders)
 	if err != nil {
 		return withdrawalList, err
 	}

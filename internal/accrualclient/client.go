@@ -18,7 +18,7 @@ import (
 type Accrual struct {
 	Order   string  `json:"order"`
 	Status  string  `json:"status"`
-	Accrual float64 `json:"accrualclient"`
+	Accrual float64 `json:"accrual"`
 }
 
 func GetAccrual(ctx context.Context, number string) (*Accrual, error) {
