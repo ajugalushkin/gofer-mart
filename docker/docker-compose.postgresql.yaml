@@ -56,7 +56,7 @@ services:
     restart: always
     build:
       context: ../
-      dockerfile: ./docker/Dockerfile
+      dockerfile: ./cmd/gophermart/Dockerfile
     image: gophermart-api:v1.0
     container_name: gophermart-api
     hostname: gophermart-api
@@ -73,18 +73,18 @@ services:
       restart_policy:
         condition: on-failure
 
-#  accrual-api:
-#    restart: always
-#    build:
-#      context: ../
-#      dockerfile: ./docker/Dockerfile
-#    image: accrual-api
-#    container_name: accrualclient-api
-#    hostname: accrualclient-api
-#    networks:
-#      - gofermart-network
-#    ports:
-#      - 81:8080
-#    deploy:
-#      restart_policy:
-#        condition: on-failure
+  accrual-api:
+    restart: always
+    build:
+      context: ../
+      dockerfile: ./cmd/accrual/Dockerfile
+    image: accrual-api
+    container_name: accrualclient-api
+    hostname: accrualclient-api
+    networks:
+      - gofermart-network
+    ports:
+      - 81:8080
+    deploy:
+      restart_policy:
+        condition: on-failure
