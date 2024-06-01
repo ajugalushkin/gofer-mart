@@ -38,3 +38,10 @@ type Withdraw struct {
 	Order string  `json:"order"`
 	Sum   float64 `json:"sum"`
 }
+
+//easyjson:json
+type Accrual struct {
+	Order   string  `json:"order"`
+	Status  string  `json:"status"`
+	Accrual float64 `json:"accrual"`
+}

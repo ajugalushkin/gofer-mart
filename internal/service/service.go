@@ -2,24 +2,23 @@ package service
 
 import (
 	"context"
+	"net/url"
 	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 
+	"github.com/ajugalushkin/gofer-mart/config"
 	"github.com/ajugalushkin/gofer-mart/internal/auth"
 	"github.com/ajugalushkin/gofer-mart/internal/dto"
 	"github.com/ajugalushkin/gofer-mart/internal/logger"
-	"github.com/ajugalushkin/gofer-mart/internal/queue"
 	"github.com/ajugalushkin/gofer-mart/internal/storage/order"
 	"github.com/ajugalushkin/gofer-mart/internal/storage/user"
 	"github.com/ajugalushkin/gofer-mart/internal/storage/withdrawal"
 	"github.com/ajugalushkin/gofer-mart/internal/userrors"
+	"github.com/ajugalushkin/gofer-mart/internal/workerpool"
 )
-
-//var defaultUserStorage user.Repository
-//var defaultOrderStorage order.Repository
-//var defaultWithdrawalStorage withdrawal.Repository
 
 type Service struct {
 	userRepo       user.Repository
@@ -68,7 +67,59 @@ func (s *Service) AddNewOrder(ctx context.Context, orderNumber string, login str
 		return err
 	}
 
-	queue.AddOrder(&newOrder)
+	parseURL, err := url.Parse(config.FlagsFromContext(ctx).AccrualSystemAddress)
+	if err != nil {
+		return err
+	}
+
+	accrualURL := url.URL{
+		Host:   parseURL.Host,
+		Path:   "/api/orders/",
+		Scheme: parseURL.Scheme}
+
+	workerPool := workerpool.NewWorkerPool(config.FlagsFromContext(ctx).NumOfWorkers)
+	countError := 0
+	go func() {
+		for {
+			workerPool.AddTask(accrualURL.String() + newOrder.Number)
+			result := workerPool.GetResult()
+
+			if result.Err != nil {
+				countError++
+				logger.LogFromContext(ctx).Debug(
+					"service.AddNewOrder: Error getting accrual",
+					zap.String("order", newOrder.Number),
+					zap.String("url", accrualURL.String()+newOrder.Number),
+					zap.Error(result.Err))
+				if countError > 3 {
+					workerPool.Stop()
+					return
+				}
+			} else {
+				logger.LogFromContext(ctx).Debug(
+					"service.AddNewOrder: getting accrual OK",
+					zap.String("order", newOrder.Number),
+				)
+				err := s.orderRepo.UpdateOrder(ctx, dto.Order{
+					Number:     result.Data.Order,
+					Status:     result.Data.Status,
+					Accrual:    result.Data.Accrual,
+					UploadedAt: time.Now(),
+					UserID:     login,
+				})
+
+				workerPool.Stop()
+
+				if err != nil {
+					logger.LogFromContext(ctx).Debug(
+						"service.AddNewOrder: Update accrual Error", zap.Error(err))
+				}
+				return
+			}
+		}
+	}()
+	go workerPool.RunBackground()
+
 	return nil
 }
 

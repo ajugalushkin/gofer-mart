@@ -20,10 +20,10 @@ type AppConfig struct {
 func init() {
 	viper.SetDefault("RunAddr", ":8080")
 	viper.SetDefault("DataBase_URI", "")
-	viper.SetDefault("AccrualSystemAddress", "")
+	viper.SetDefault("AccrualSystemAddress", "http://localhost:81")
 	viper.SetDefault("TokenKey", "")
 	viper.SetDefault("NumOfWorkers", 10)
-	viper.SetDefault("LogLevel", "info")
+	viper.SetDefault("LogLevel", "debug")
 }
 
 func bindToEnv() {
@@ -41,7 +41,7 @@ func bindToFlag() {
 	flag.String("d", "postgres://postgres:postgres@localhost/postgres?sslmode=disable",
 		"database connection address")
 	flag.String("r", "", "address of the accrualclient calculation system")
-	flag.String("l", "info", "log level")
+	flag.String("l", "debug", "log level")
 
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	pflag.Parse()

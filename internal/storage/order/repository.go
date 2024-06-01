@@ -158,7 +158,8 @@ func (r *repo) CheckOrderExists(ctx context.Context, orderNumber string, login s
 		return errors.Wrap(err, "repository.CheckOrderExists")
 	}
 	if orderList == nil {
-		return errors.Wrap(err, "repository.CheckOrderExists")
+		logger.LogFromContext(ctx).Debug("repository.CheckOrderExists Error", zap.Error(err))
+		return errors.New("repository.CheckOrderExists Error")
 	}
 	return nil
 }

@@ -64,7 +64,7 @@ func (r *repo) GetWithdrawalList(ctx context.Context, orders []string) (*dto.Wit
 		sb := squirrel.StatementBuilder.
 			Select("number", "sum", "processed_at").
 			From("withdrawals").
-			Where(squirrel.Eq{"order_id": orders}).
+			Where(squirrel.Eq{"number": orders}).
 			PlaceholderFormat(squirrel.Dollar).
 			RunWith(r.db)
 

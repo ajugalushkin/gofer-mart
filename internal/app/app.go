@@ -6,11 +6,11 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/ShiraazMoollatjie/goluhn"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
-
-	"github.com/ShiraazMoollatjie/goluhn"
+	"go.uber.org/zap"
 
 	"github.com/ajugalushkin/gofer-mart/config"
 	"github.com/ajugalushkin/gofer-mart/internal/compress"
@@ -20,7 +20,6 @@ import (
 	"github.com/ajugalushkin/gofer-mart/internal/service"
 	"github.com/ajugalushkin/gofer-mart/internal/storage"
 	"github.com/ajugalushkin/gofer-mart/internal/userrors"
-	"github.com/ajugalushkin/gofer-mart/internal/worker"
 )
 
 type App struct {
@@ -35,9 +34,6 @@ func NewApp(ctx context.Context, db *sqlx.DB) *App {
 	cfg := config.FlagsFromContext(ctx)
 
 	ctx = storage.ContextWithConnect(ctx, db)
-	for i := 0; i < cfg.NumOfWorkers; i++ {
-		worker.Start(ctx)
-	}
 
 	log, _ := logger.Initialize(cfg.LogLevel)
 	ctx = logger.ContextWithLogger(ctx, log)
@@ -55,11 +51,11 @@ func (a App) Routes(r *echo.Echo) {
 	r.POST("/api/user/orders", a.authorized(a.postOrders))
 	r.GET("/api/user/orders", a.authorized(a.getOrders))
 
-	r.POST("/api/user/accrual/withdraw", a.postBalanceWithdraw)
-	r.GET("/api/user/accrual", a.getBalance)
+	r.POST("/api/user/accrual/withdraw", a.authorized(a.postBalanceWithdraw))
+	r.GET("/api/user/accrual", a.authorized(a.getBalance))
 
-	r.GET("/api/user/withdrawal", a.getWithdrawals)
-	r.POST("/api/user/balance/withdraw", a.postBalanceWithdraw)
+	r.GET("/api/user/withdrawal", a.authorized(a.getWithdrawals))
+	r.POST("/api/user/balance/withdraw", a.authorized(a.postBalanceWithdraw))
 
 	//Middleware
 	r.Use(logger.MiddlewareLogger(a.ctx))
@@ -178,15 +174,18 @@ func (a App) postOrders(echoCtx echo.Context) error {
 func (a App) getOrders(echoCtx echo.Context) error {
 	cookie, err := echoCtx.Cookie(cookieName)
 	if err != nil {
+		logger.LogFromContext(a.ctx).Debug("app.getOrders: Error getting cookie data")
 		return echoCtx.JSON(http.StatusUnauthorized, err.Error())
 	}
 	login := cookies.GetLogin(a.ctx, cookie.Value)
+	logger.LogFromContext(a.ctx).Debug("get Login", zap.String("login", login.Login))
 
 	orderList, err := a.service.GetOrders(a.ctx, login.Login)
 	if err != nil {
+		logger.LogFromContext(a.ctx).Debug("app.getOrders: Error getting order list")
 		return echoCtx.JSON(http.StatusNoContent, err.Error())
 	}
-
+	logger.LogFromContext(a.ctx).Debug("app.getOrders: Ok")
 	return echoCtx.JSON(http.StatusOK, orderList)
 }
 
