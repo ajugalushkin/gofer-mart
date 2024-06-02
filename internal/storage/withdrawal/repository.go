@@ -15,7 +15,7 @@ import (
 
 type Repository interface {
 	AddNewWithdrawal(ctx context.Context, accrual dto.Withdrawal) error
-	GetWithdrawalList(ctx context.Context, orders []string) (*dto.WithdrawalList, error)
+	GetWithdrawalList(ctx context.Context, userId string) (*dto.WithdrawalList, error)
 }
 
 func NewRepository(db *sqlx.DB) Repository {
@@ -33,7 +33,7 @@ func (r *repo) AddNewWithdrawal(ctx context.Context, withdrawal dto.Withdrawal) 
 	err = database.WithTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		sb := squirrel.StatementBuilder.
 			Insert("withdrawals").
-			Columns("number", "sum", "processed_at").
+			Columns("number", "sum", "processed_at, user_id").
 			PlaceholderFormat(squirrel.Dollar).
 			RunWith(r.db)
 
@@ -41,6 +41,7 @@ func (r *repo) AddNewWithdrawal(ctx context.Context, withdrawal dto.Withdrawal) 
 			withdrawal.Number,
 			withdrawal.Sum,
 			withdrawal.ProcessedAt,
+			withdrawal.UserID,
 		)
 
 		_, err = sb.ExecContext(ctx)
@@ -54,7 +55,7 @@ func (r *repo) AddNewWithdrawal(ctx context.Context, withdrawal dto.Withdrawal) 
 	return nil
 }
 
-func (r *repo) GetWithdrawalList(ctx context.Context, orders []string) (*dto.WithdrawalList, error) {
+func (r *repo) GetWithdrawalList(ctx context.Context, userId string) (*dto.WithdrawalList, error) {
 	var (
 		err            error
 		withdrawalList dto.WithdrawalList
@@ -64,7 +65,7 @@ func (r *repo) GetWithdrawalList(ctx context.Context, orders []string) (*dto.Wit
 		sb := squirrel.StatementBuilder.
 			Select("number", "sum", "processed_at").
 			From("withdrawals").
-			Where(squirrel.Eq{"number": orders}).
+			Where(squirrel.Eq{"user_id": userId}).
 			PlaceholderFormat(squirrel.Dollar).
 			RunWith(r.db)
 

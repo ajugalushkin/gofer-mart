@@ -12,12 +12,13 @@ type User struct {
 
 type Order struct {
 	Number     string    `db:"number" `
-	UploadedAt time.Time `db:"uploaded_at"`
 	Status     string    `db:"status"`
-	Accrual    float64   `db:"accrual" `
+	Accrual    *float64  `db:"accrual" `
+	UploadedAt time.Time `db:"uploaded_at"`
 	UserID     string    `db:"user_id" `
 }
 
+//easyjson:json
 type OrderList []Order
 
 //easyjson:json
@@ -30,8 +31,14 @@ type Withdrawal struct {
 	Number      string    `db:"number" `
 	Sum         float64   `db:"sum" `
 	ProcessedAt time.Time `db:"processed_at"`
+	UserID      string    `db:"user_id" `
 }
-type WithdrawalList []Withdrawal
+
+type WithdrawalList []struct {
+	Number      string    `db:"number" json:"order" `
+	Sum         float64   `db:"sum" json:"sum" `
+	ProcessedAt time.Time `db:"processed_at" json:"processed_at"`
+}
 
 //easyjson:json
 type Withdraw struct {

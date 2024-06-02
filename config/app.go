@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 
+	"github.com/joho/godotenv"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
@@ -13,27 +14,27 @@ type AppConfig struct {
 	DataBaseURI          string `env:"DATABASE_URI"`
 	AccrualSystemAddress string `env:"ACCRUAL_SYSTEM_ADDRESS"`
 	TokenKey             string `env:"TOKEN_KEY"`
-	NumOfWorkers         int    `env:"NUM_WORKERS"`
+	NumWorkers           int    `env:"NUM_WORKERS"`
 	LogLevel             string `env:"LOG_LEVEL"`
 }
 
 func init() {
-	viper.SetDefault("RunAddr", ":8080")
+	godotenv.Load("/docker/.env")
+	viper.SetDefault("Run_Address", "")
 	viper.SetDefault("DataBase_URI", "")
-	viper.SetDefault("AccrualSystemAddress", "http://localhost:81")
-	viper.SetDefault("TokenKey", "")
-	viper.SetDefault("NumOfWorkers", 10)
-	viper.SetDefault("LogLevel", "debug")
+	viper.SetDefault("Accrual_System_Address", "")
+	viper.SetDefault("Token_Key", "")
+	viper.SetDefault("Num_Workers", 0)
+	viper.SetDefault("Log_Level", "")
 }
 
 func bindToEnv() {
-	//viper.SetEnvPrefix("test")
-	_ = viper.BindEnv("RunAddr")
+	_ = viper.BindEnv("Run_Address")
 	_ = viper.BindEnv("DataBase_URI")
-	_ = viper.BindEnv("AccrualSystemAddress")
-	_ = viper.BindEnv("TokenKey")
-	_ = viper.BindEnv("NumOfWorkers")
-	_ = viper.BindEnv("LogLevel")
+	_ = viper.BindEnv("Accrual_System_Address")
+	_ = viper.BindEnv("Token_Key")
+	_ = viper.BindEnv("Num_Workers")
+	_ = viper.BindEnv("Log_Level")
 }
 
 func bindToFlag() {
@@ -53,12 +54,12 @@ func ReadConfig() *AppConfig {
 	bindToEnv()
 
 	result := &AppConfig{
-		RunAddr:              viper.GetString("RunAddr"),
+		RunAddr:              viper.GetString("Run_Address"),
 		DataBaseURI:          viper.GetString("DataBase_URI"),
-		AccrualSystemAddress: viper.GetString("AccrualSystemAddress"),
-		TokenKey:             viper.GetString("TokenKey"),
-		NumOfWorkers:         viper.GetInt("NumOfWorkers"),
-		LogLevel:             viper.GetString("LogLevel"),
+		AccrualSystemAddress: viper.GetString("Accrual_System_Address"),
+		TokenKey:             viper.GetString("Token_Key"),
+		NumWorkers:           viper.GetInt("Num_Workers"),
+		LogLevel:             viper.GetString("Log_Level"),
 	}
 	return result
 }

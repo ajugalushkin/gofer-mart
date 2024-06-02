@@ -1,0 +1,27 @@
+services:
+  gophermart-api:
+    depends_on:
+      postgres:
+        condition: service_healthy
+      accrual-api:
+        condition: service_started
+    restart: always
+    build:
+      context: ../
+      dockerfile: ./cmd/gophermart/Dockerfile
+    image: gophermart-api:v1.0
+    container_name: gophermart-api
+    hostname: gophermart-api
+    ports:
+      - 8080:8080
+    environment:
+      RUN_ADDRESS: ${RUN_ADDRESS:?Please configure RUN_ADDRESS in the .env file}
+      DATABASE_URI: ${DATABASE_URI:?Please configure DATABASE_URI in the .env file}
+      ACCRUAL_SYSTEM_ADDRESS: ${ACCRUAL_SYSTEM_ADDRESS:?Please configure ACCRUAL_SYSTEM_ADDRESS in the .env file}
+      NUM_WORKERS: ${NUM_WORKERS:?Please configure NUM_WORKERS in the .env file}
+      LOG_LEVEL: ${LOG_LEVEL:?Please configure LOG_LEVEL in the .env file}
+    deploy:
+      restart_policy:
+        condition: on-failure
+    networks:
+      - gofermart-network

@@ -2,6 +2,7 @@ package order
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/jackc/pgerrcode"
@@ -22,7 +23,7 @@ type Repository interface {
 	AddNewOrder(ctx context.Context, user dto.Order) error
 	GetOrderList(ctx context.Context, userID string) (*dto.OrderList, error)
 	UpdateOrder(ctx context.Context, user dto.Order) error
-	CheckOrderExists(ctx context.Context, orderNumber string, userID string) error
+	CheckOrderExists(ctx context.Context, orderNumber string, login string) error
 }
 
 func NewRepository(db *sqlx.DB) Repository {
@@ -89,7 +90,7 @@ func (r *repo) GetOrderList(ctx context.Context, user string) (*dto.OrderList, e
 
 	err = database.WithTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		sb := squirrel.StatementBuilder.
-			Select("number", "uploaded_at", "status", "user_id").
+			Select("number", "uploaded_at", "status", "accrual", "user_id").
 			From(orderTableName).
 			OrderBy("uploaded_at ASC").
 			Where(squirrel.Eq{"user_id": user}).
@@ -111,13 +112,18 @@ func (r *repo) GetOrderList(ctx context.Context, user string) (*dto.OrderList, e
 }
 
 func (r *repo) UpdateOrder(ctx context.Context, user dto.Order) error {
-	err := database.WithTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
+	orderNumber, err := strconv.Atoi(user.Number)
+	if err != nil {
+		return err
+	}
+
+	err = database.WithTx(ctx, r.db, func(ctx context.Context, tx *sqlx.Tx) error {
 		sb := squirrel.StatementBuilder.
 			Update(orderTableName).
 			Set("uploaded_at", user.UploadedAt).
 			Set("status", user.Status).
 			Set("accrual", user.Accrual).
-			Where(squirrel.Eq{"number": user.Number}).
+			Where(squirrel.Eq{"number": orderNumber}).
 			PlaceholderFormat(squirrel.Dollar).
 			RunWith(r.db)
 

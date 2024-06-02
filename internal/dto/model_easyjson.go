@@ -245,7 +245,73 @@ func (v *User) UnmarshalJSON(data []byte) error {
 func (v *User) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto2(l, v)
 }
-func easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto3(in *jlexer.Lexer, out *Order) {
+func easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto3(in *jlexer.Lexer, out *OrderList) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		in.Skip()
+		*out = nil
+	} else {
+		in.Delim('[')
+		if *out == nil {
+			if !in.IsDelim(']') {
+				*out = make(OrderList, 0, 0)
+			} else {
+				*out = OrderList{}
+			}
+		} else {
+			*out = (*out)[:0]
+		}
+		for !in.IsDelim(']') {
+			var v1 Order
+			(v1).UnmarshalEasyJSON(in)
+			*out = append(*out, v1)
+			in.WantComma()
+		}
+		in.Delim(']')
+	}
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto3(out *jwriter.Writer, in OrderList) {
+	if in == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
+		out.RawString("null")
+	} else {
+		out.RawByte('[')
+		for v2, v3 := range in {
+			if v2 > 0 {
+				out.RawByte(',')
+			}
+			(v3).MarshalEasyJSON(out)
+		}
+		out.RawByte(']')
+	}
+}
+
+// MarshalJSON supports json.Marshaler interface
+func (v OrderList) MarshalJSON() ([]byte, error) {
+	w := jwriter.Writer{}
+	easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto3(&w, v)
+	return w.Buffer.BuildBytes(), w.Error
+}
+
+// MarshalEasyJSON supports easyjson.Marshaler interface
+func (v OrderList) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto3(w, v)
+}
+
+// UnmarshalJSON supports json.Unmarshaler interface
+func (v *OrderList) UnmarshalJSON(data []byte) error {
+	r := jlexer.Lexer{Data: data}
+	easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto3(&r, v)
+	return r.Error()
+}
+
+// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
+func (v *OrderList) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto3(l, v)
+}
+func easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto4(in *jlexer.Lexer, out *Order) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -266,14 +332,22 @@ func easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto3(in *jlexer
 		switch key {
 		case "Number":
 			out.Number = string(in.String())
+		case "Status":
+			out.Status = string(in.String())
+		case "Accrual":
+			if in.IsNull() {
+				in.Skip()
+				out.Accrual = nil
+			} else {
+				if out.Accrual == nil {
+					out.Accrual = new(float64)
+				}
+				*out.Accrual = float64(in.Float64())
+			}
 		case "UploadedAt":
 			if data := in.Raw(); in.Ok() {
 				in.AddError((out.UploadedAt).UnmarshalJSON(data))
 			}
-		case "Status":
-			out.Status = string(in.String())
-		case "Accrual":
-			out.Accrual = float64(in.Float64())
 		case "UserID":
 			out.UserID = string(in.String())
 		default:
@@ -286,7 +360,7 @@ func easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto3(in *jlexer
 		in.Consumed()
 	}
 }
-func easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto3(out *jwriter.Writer, in Order) {
+func easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto4(out *jwriter.Writer, in Order) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -296,11 +370,6 @@ func easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto3(out *jwrit
 		out.String(string(in.Number))
 	}
 	{
-		const prefix string = ",\"UploadedAt\":"
-		out.RawString(prefix)
-		out.Raw((in.UploadedAt).MarshalJSON())
-	}
-	{
 		const prefix string = ",\"Status\":"
 		out.RawString(prefix)
 		out.String(string(in.Status))
@@ -308,7 +377,16 @@ func easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto3(out *jwrit
 	{
 		const prefix string = ",\"Accrual\":"
 		out.RawString(prefix)
-		out.Float64(float64(in.Accrual))
+		if in.Accrual == nil {
+			out.RawString("null")
+		} else {
+			out.Float64(float64(*in.Accrual))
+		}
+	}
+	{
+		const prefix string = ",\"UploadedAt\":"
+		out.RawString(prefix)
+		out.Raw((in.UploadedAt).MarshalJSON())
 	}
 	{
 		const prefix string = ",\"UserID\":"
@@ -321,27 +399,27 @@ func easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto3(out *jwrit
 // MarshalJSON supports json.Marshaler interface
 func (v Order) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto3(&w, v)
+	easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto4(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Order) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto3(w, v)
+	easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto4(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Order) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto3(&r, v)
+	easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto4(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Order) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto3(l, v)
+	easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto4(l, v)
 }
-func easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto4(in *jlexer.Lexer, out *Balance) {
+func easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto5(in *jlexer.Lexer, out *Balance) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -374,7 +452,7 @@ func easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto4(in *jlexer
 		in.Consumed()
 	}
 }
-func easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto4(out *jwriter.Writer, in Balance) {
+func easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto5(out *jwriter.Writer, in Balance) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -394,23 +472,103 @@ func easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto4(out *jwrit
 // MarshalJSON supports json.Marshaler interface
 func (v Balance) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto4(&w, v)
+	easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto5(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Balance) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto4(w, v)
+	easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto5(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Balance) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto4(&r, v)
+	easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto5(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Balance) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto4(l, v)
+	easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto5(l, v)
+}
+func easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto6(in *jlexer.Lexer, out *Accrual) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		if isTopLevel {
+			in.Consumed()
+		}
+		in.Skip()
+		return
+	}
+	in.Delim('{')
+	for !in.IsDelim('}') {
+		key := in.UnsafeFieldName(false)
+		in.WantColon()
+		if in.IsNull() {
+			in.Skip()
+			in.WantComma()
+			continue
+		}
+		switch key {
+		case "order":
+			out.Order = string(in.String())
+		case "status":
+			out.Status = string(in.String())
+		case "accrual":
+			out.Accrual = float64(in.Float64())
+		default:
+			in.SkipRecursive()
+		}
+		in.WantComma()
+	}
+	in.Delim('}')
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto6(out *jwriter.Writer, in Accrual) {
+	out.RawByte('{')
+	first := true
+	_ = first
+	{
+		const prefix string = ",\"order\":"
+		out.RawString(prefix[1:])
+		out.String(string(in.Order))
+	}
+	{
+		const prefix string = ",\"status\":"
+		out.RawString(prefix)
+		out.String(string(in.Status))
+	}
+	{
+		const prefix string = ",\"accrual\":"
+		out.RawString(prefix)
+		out.Float64(float64(in.Accrual))
+	}
+	out.RawByte('}')
+}
+
+// MarshalJSON supports json.Marshaler interface
+func (v Accrual) MarshalJSON() ([]byte, error) {
+	w := jwriter.Writer{}
+	easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto6(&w, v)
+	return w.Buffer.BuildBytes(), w.Error
+}
+
+// MarshalEasyJSON supports easyjson.Marshaler interface
+func (v Accrual) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjsonC80ae7adEncodeGithubComAjugalushkinGoferMartInternalDto6(w, v)
+}
+
+// UnmarshalJSON supports json.Unmarshaler interface
+func (v *Accrual) UnmarshalJSON(data []byte) error {
+	r := jlexer.Lexer{Data: data}
+	easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto6(&r, v)
+	return r.Error()
+}
+
+// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
+func (v *Accrual) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjsonC80ae7adDecodeGithubComAjugalushkinGoferMartInternalDto6(l, v)
 }

@@ -1,6 +1,10 @@
 package workerpool
 
 import (
+	"context"
+	"fmt"
+	"time"
+
 	"github.com/ajugalushkin/gofer-mart/internal/dto"
 )
 
@@ -27,18 +31,18 @@ func NewWorkerPool(workerCount int) *WorkerPool {
 	}
 }
 
-func (wp *WorkerPool) RunBackground() {
-	//go func() {
-	//	for {
-	//		fmt.Print("⌛ Waiting for tasks to come in ...\n")
-	//		time.Sleep(10 * time.Second)
-	//	}
-	//}()
+func (wp *WorkerPool) RunBackground(ctx context.Context) {
+	go func() {
+		for {
+			fmt.Print("⌛ Waiting for tasks to come in ...\n")
+			time.Sleep(10 * time.Second)
+		}
+	}()
 
 	for i := 1; i <= wp.workerCount; i++ {
 		worker := NewWorker(wp.taskQueue, i, wp.resultChan)
 		wp.Workers = append(wp.Workers, worker)
-		go worker.StartBackground()
+		go worker.StartBackground(ctx)
 	}
 
 	wp.runBackground = make(chan bool)
@@ -58,4 +62,17 @@ func (p *WorkerPool) Stop() {
 		p.Workers[i].Stop()
 	}
 	p.runBackground <- true
+}
+
+type ctxWorkerPool struct{}
+
+func ContextWorkerPool(ctx context.Context, pool *WorkerPool) context.Context {
+	return context.WithValue(ctx, ctxWorkerPool{}, pool)
+}
+
+func WorkerPoolFromContext(ctx context.Context) *WorkerPool {
+	if pool, ok := ctx.Value(ctxWorkerPool{}).(*WorkerPool); ok {
+		return pool
+	}
+	return nil
 }
