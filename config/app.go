@@ -28,9 +28,9 @@ func init() {
 	viper.SetDefault("Run_Address", "")
 	viper.SetDefault("DataBase_URI", "")
 	viper.SetDefault("Accrual_System_Address", "")
-	viper.SetDefault("Token_Key", "")
-	viper.SetDefault("Num_Workers", 0)
-	viper.SetDefault("Log_Level", "")
+	viper.SetDefault("Token_Key", "12345")
+	viper.SetDefault("Num_Workers", 5)
+	viper.SetDefault("Log_Level", "Info")
 }
 
 func bindToEnv() {
