@@ -5,6 +5,7 @@ import (
 	"flag"
 
 	"github.com/joho/godotenv"
+	"github.com/labstack/gommon/log"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
@@ -19,7 +20,11 @@ type AppConfig struct {
 }
 
 func init() {
-	godotenv.Load("/docker/.env")
+	err := godotenv.Load("/docker/.env")
+	if err != nil {
+		log.Debug("Error loading .env file", "error", err)
+	}
+
 	viper.SetDefault("Run_Address", "")
 	viper.SetDefault("DataBase_URI", "")
 	viper.SetDefault("Accrual_System_Address", "")

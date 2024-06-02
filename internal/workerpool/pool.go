@@ -57,11 +57,11 @@ func (wp *WorkerPool) GetResult() Result {
 	return <-wp.resultChan
 }
 
-func (p *WorkerPool) Stop() {
-	for i := range p.Workers {
-		p.Workers[i].Stop()
+func (wp *WorkerPool) Stop() {
+	for i := range wp.Workers {
+		wp.Workers[i].Stop()
 	}
-	p.runBackground <- true
+	wp.runBackground <- true
 }
 
 type ctxWorkerPool struct{}
