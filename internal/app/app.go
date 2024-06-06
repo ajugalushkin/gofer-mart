@@ -130,6 +130,11 @@ func (a App) login(echoCtx echo.Context) error {
 	return echoCtx.JSON(http.StatusOK, "")
 }
 
+type CustomContext struct {
+	login *dto.User
+	echo.Context
+}
+
 func (a App) authorized(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(echoCtx echo.Context) error {
 		cookie, err := echoCtx.Cookie(cookieName)
@@ -141,11 +146,17 @@ func (a App) authorized(next echo.HandlerFunc) echo.HandlerFunc {
 			return echoCtx.JSON(http.StatusUnauthorized, "")
 		}
 
-		return next(echoCtx)
+		login := cookies.GetLogin(a.ctx, cookie.Value)
+
+		newContext := &CustomContext{login: login, Context: echoCtx}
+
+		return next(newContext)
 	}
 }
 
-func (a App) postOrders(echoCtx echo.Context) error {
+func (a App) postOrders(c echo.Context) error {
+	echoCtx := c.(*CustomContext)
+
 	body, err := io.ReadAll(echoCtx.Request().Body)
 	if err != nil {
 		return echoCtx.JSON(http.StatusBadRequest, err.Error())
@@ -157,13 +168,7 @@ func (a App) postOrders(echoCtx echo.Context) error {
 		return echoCtx.JSON(http.StatusUnprocessableEntity, err.Error())
 	}
 
-	cookie, err := echoCtx.Cookie(cookieName)
-	if err != nil {
-		return echoCtx.JSON(http.StatusUnauthorized, err.Error())
-	}
-	login := cookies.GetLogin(a.ctx, cookie.Value)
-
-	err = a.service.AddNewOrder(a.ctx, order, login.Login)
+	err = a.service.AddNewOrder(a.ctx, order, echoCtx.login.Login)
 	if err != nil {
 		if errors.Is(err, userrors.ErrorOrderAlreadyUploadedAnotherUser) {
 			return echoCtx.JSON(http.StatusConflict, err.Error())
@@ -176,14 +181,9 @@ func (a App) postOrders(echoCtx echo.Context) error {
 	return echoCtx.JSON(http.StatusAccepted, "")
 }
 
-func (a App) getOrders(echoCtx echo.Context) error {
-	cookie, err := echoCtx.Cookie(cookieName)
-	if err != nil {
-		return echoCtx.JSON(http.StatusUnauthorized, err.Error())
-	}
-	login := cookies.GetLogin(a.ctx, cookie.Value)
-
-	orderList, err := a.service.GetOrders(a.ctx, login.Login)
+func (a App) getOrders(c echo.Context) error {
+	echoCtx := c.(*CustomContext)
+	orderList, err := a.service.GetOrders(a.ctx, echoCtx.login.Login)
 	if err != nil {
 		return echoCtx.JSON(http.StatusNoContent, err.Error())
 	}
@@ -191,31 +191,22 @@ func (a App) getOrders(echoCtx echo.Context) error {
 	return echoCtx.JSON(http.StatusOK, orderList)
 }
 
-func (a App) getBalance(echoCtx echo.Context) error {
-	cookie, err := echoCtx.Cookie(cookieName)
-	if err != nil {
-		return echoCtx.JSON(http.StatusUnauthorized, err.Error())
-	}
-	login := cookies.GetLogin(a.ctx, cookie.Value)
-
-	balance, err := a.service.GetBalance(a.ctx, login.Login)
+func (a App) getBalance(c echo.Context) error {
+	echoCtx := c.(*CustomContext)
+	balance, err := a.service.GetBalance(a.ctx, echoCtx.login.Login)
 	if err != nil {
 		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return echoCtx.JSON(http.StatusOK, balance)
 }
 
-func (a App) postBalanceWithdraw(echoCtx echo.Context) error {
+func (a App) postBalanceWithdraw(c echo.Context) error {
+	echoCtx := c.(*CustomContext)
+
 	body, err := io.ReadAll(echoCtx.Request().Body)
 	if err != nil {
 		return echoCtx.JSON(http.StatusBadRequest, err.Error())
 	}
-
-	cookie, err := echoCtx.Cookie(cookieName)
-	if err != nil {
-		return echoCtx.JSON(http.StatusUnauthorized, err.Error())
-	}
-	login := cookies.GetLogin(a.ctx, cookie.Value)
 
 	withdraw := dto.Withdraw{}
 	err = withdraw.UnmarshalJSON(body)
@@ -223,7 +214,7 @@ func (a App) postBalanceWithdraw(echoCtx echo.Context) error {
 		return echoCtx.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	err = a.service.AddNewWithdrawal(a.ctx, withdraw, login.Login)
+	err = a.service.AddNewWithdrawal(a.ctx, withdraw, echoCtx.login.Login)
 	if err != nil {
 		if errors.Is(err, userrors.ErrorInsufficientFunds) {
 			return echoCtx.JSON(http.StatusPaymentRequired, err.Error())
@@ -236,14 +227,10 @@ func (a App) postBalanceWithdraw(echoCtx echo.Context) error {
 	return echoCtx.JSON(http.StatusOK, "")
 }
 
-func (a App) getWithdrawals(echoCtx echo.Context) error {
-	cookie, err := echoCtx.Cookie(cookieName)
-	if err != nil {
-		return echoCtx.JSON(http.StatusUnauthorized, err.Error())
-	}
-	login := cookies.GetLogin(a.ctx, cookie.Value)
+func (a App) getWithdrawals(c echo.Context) error {
+	echoCtx := c.(*CustomContext)
 
-	list, err := a.service.GetWithdrawalList(a.ctx, login.Login)
+	list, err := a.service.GetWithdrawalList(a.ctx, echoCtx.login.Login)
 	if err != nil {
 		return echoCtx.JSON(http.StatusNoContent, err.Error())
 	}
